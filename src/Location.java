@@ -18,4 +18,12 @@ public class Location {
     public String toString() {
         return String.format("loc:{%d, %d)", _x, _y);
     }
+
+    public int X() {
+        return _x;
+    }
+
+    public int Y() {
+        return _y;
+    }
 }

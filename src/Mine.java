@@ -1,7 +1,11 @@
-public class Mine {
-    private Location _loc;
+public class Mine extends Tile {
+    public Mine(Location l) {
+        super.setLocation(l);
+    }
 
-    public void setLocation(Location l) {
-        _loc = l;
+    @Override
+    public void flip() throws GameEndException {
+        super.flip();
+        throw new GameEndException("You have hit a mine.");
     }
 }
