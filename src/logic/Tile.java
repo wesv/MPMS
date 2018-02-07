@@ -1,3 +1,7 @@
+package logic;
+
+import exceptions.GameEndException;
+
 public abstract class Tile {
     protected Location _loc;
     protected boolean _accessed;

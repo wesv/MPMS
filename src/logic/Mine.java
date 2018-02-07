@@ -1,3 +1,7 @@
+package logic;
+
+import exceptions.GameEndException;
+
 public class Mine extends Tile {
     public Mine(Location l) {
         super.setLocation(l);
