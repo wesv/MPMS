@@ -2,10 +2,10 @@ package logic;
 
 public class Array2D<E> {
 
-    E[][] _elements;
+    private E[][] _elements;
 
     public Array2D(int n) {
-        _elements = new E[n][n];
+        _elements = (E[][]) new Object[n][n];
     }
 
     public E at(Location l) {

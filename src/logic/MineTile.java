@@ -2,9 +2,11 @@ package logic;
 
 import exceptions.GameEndException;
 
-public class Mine extends Tile {
-    public Mine(Location l) {
+public class MineTile extends Tile {
+    public MineTile(Location l) {
         super.setLocation(l);
+
+        this.thisChar = "M";
     }
 
     @Override

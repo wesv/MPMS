@@ -3,10 +3,10 @@ import exceptions.GameEndException;
 
 public class Main {
     public static void main(String[] args) {
-        try {
-            new Mine(Location.create()).flip();
-        } catch(GameEndException e) {
-            System.out.println(e.getMessage());
-        }
+        Field f = new Field(3, 2);
+        f.flipAllMinea();
+
+
+        System.out.println(f.print());
     }
 }

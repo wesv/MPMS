@@ -1,10 +1,12 @@
 package logic;
 
-public class Number extends Tile {
+public class NumberTile extends Tile {
     private int _surroundingMines;
 
-    public Number(int numMines) {
+    public NumberTile(int numMines) {
         _surroundingMines = numMines;
+
+        this.thisChar = "" +numMines;
     }
 
     public int getNumMines() {

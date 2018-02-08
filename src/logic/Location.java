@@ -33,6 +33,22 @@ public class Location {
         return Location.create(this._x + 1, this._y);
     }
 
+    public Location diagonalUpLeft() {
+        return Location.create(this._x - 1, this._y - 1);
+    }
+
+    public Location diagonalUpRight() {
+        return Location.create(this._x + 1, this._y - 1);
+    }
+
+    public Location diagonalDownLeft() {
+        return Location.create(this._x - 1, this._y + 1);
+    }
+
+    public Location diagonalDownRight() {
+        return Location.create(this._x + 1, this._y + 1);
+    }
+
     public String toString() {
         return String.format("loc:{%d, %d)", _x, _y);
     }
