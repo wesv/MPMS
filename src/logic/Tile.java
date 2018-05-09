@@ -6,8 +6,6 @@ import exceptions.GameEndException;
  * The outline for any Tile. The board is filled with tiles.
  */
 public abstract class Tile {
-    /* The location of this tile */
-    protected Location _loc;
 
     /* Whether this tile has been selected or not */
     protected boolean _accessed;
@@ -15,23 +13,7 @@ public abstract class Tile {
     /* The character to place when its flipped */
     protected String thisChar;
 
-    /**
-     *  Get a hard copy of this Tile's location
-     *
-     *  @Return This units Location
-     */
-    public Location getLocation() {
-        return Location.create(_loc.X(), _loc.Y());
-    }
-
-    /**
-     * Sets the location of this object.
-     *
-     * @param l the location to set to this object
-     */
-    public void setLocation(Location l) {
-        _loc = l;
-    }
+    protected boolean _flag;
 
     /**
      * This method returns true if the flip method for this class has
@@ -53,6 +35,8 @@ public abstract class Tile {
     public String getChar() {
         if(this.hasBeenAccessed())
             return thisChar;
+        if(this.isFlagged())
+            return "⚑";
         return "_";
     }
 
@@ -62,5 +46,17 @@ public abstract class Tile {
      */
     public void flip() throws GameEndException {
         _accessed = true;
+    }
+
+    public void setFlag() {
+        _flag = true;
+    }
+
+    public void removeFlag() {
+        _flag = false;
+    }
+
+    public boolean isFlagged() {
+        return _flag;
     }
 }

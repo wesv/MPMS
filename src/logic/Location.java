@@ -18,19 +18,19 @@ public class Location {
     }
 
     public Location up() {
-        return Location.create(this._x, this._y - 1);
-    }
-
-    public Location down() {
-        return Location.create(this._x, this._y + 1);
-    }
-
-    public Location left() {
         return Location.create(this._x - 1, this._y);
     }
 
-    public Location right() {
+    public Location down() {
         return Location.create(this._x + 1, this._y);
+    }
+
+    public Location left() {
+        return Location.create(this._x, this._y - 1);
+    }
+
+    public Location right() {
+        return Location.create(this._x, this._y + 1);
     }
 
     public Location diagonalUpLeft() {
@@ -38,11 +38,11 @@ public class Location {
     }
 
     public Location diagonalUpRight() {
-        return Location.create(this._x + 1, this._y - 1);
+        return Location.create(this._x - 1, this._y + 1);
     }
 
     public Location diagonalDownLeft() {
-        return Location.create(this._x - 1, this._y + 1);
+        return Location.create(this._x + 1, this._y - 1);
     }
 
     public Location diagonalDownRight() {

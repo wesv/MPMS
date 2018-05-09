@@ -1,5 +1,8 @@
 package logic;
 
+import java.util.Arrays;
+import java.util.stream.Stream;
+
 public class Array2D<E> {
 
     private E[][] _elements;
@@ -14,5 +17,9 @@ public class Array2D<E> {
 
     public void putAt(E element, Location l) {
         _elements[l.X()][l.Y()] = element;
+    }
+
+    public Stream<E> stream() {
+        return Arrays.stream(_elements).flatMap(Arrays::stream);
     }
 }

@@ -2,6 +2,8 @@ package logic;
 
 import exceptions.GameEndException;
 
+import java.util.Arrays;
+
 public class Field {
     /* The size of the board in nxn */
     private int _n;
@@ -18,39 +20,57 @@ public class Field {
         initBoard();
     }
 
-    public boolean canFlip(Location l) {
-        return _board.at(l).hasBeenAccessed();
+    public boolean isValidLocation(Location loc) {
+        return loc.X() >= 0 && loc.X() < this._n
+                && loc.Y() >= 0 && loc.Y() < this._n;
+    }
+
+    public void flag(int x, int y) {
+        flag(Location.create(x, y));
+    }
+
+    public void flag(Location loc) {
+        if(_board.at(loc).isFlagged())
+            _board.at(loc).removeFlag();
+        else
+            _board.at(loc).setFlag();
     }
 
     public void flip(Location l) throws GameEndException{
+
+        if(!isValidLocation(l)) return;
+
         Tile t = _board.at(l);
 
-        /*if(t instanceof BlankTile) {
-            if(!(_board.at(l.up()) instanceof MineTile)) {
-                this.flip(l.up());
-            }
-            if(!(_board.at(l.down()) instanceof MineTile)) {
-                this.flip(l.down());
-            }
-            if(!(_board.at(l.left()) instanceof MineTile)) {
-                this.flip(l.left());
-            }
-            if(!(_board.at(l.right()) instanceof MineTile)) {
-                this.flip(l.right());
-            }
-        }*/
+        if(t.isFlagged() || t.hasBeenAccessed()) return;
 
         t.flip();
+
+        if(t instanceof BlankTile) {
+            flip(l.up());
+            flip(l.down());
+            flip(l.left());
+            flip(l.right());
+            flip(l.diagonalUpLeft());
+            flip(l.diagonalUpRight());
+            flip(l.diagonalDownLeft());
+            flip(l.diagonalDownRight());
+        }
     }
 
-    public void flipAllMinea() {
+    public void flip(int x, int y) throws GameEndException {
+        flip(Location.create(x, y));
+    }
+
+    public void flipAllMines() {
         for(int x = 0; x < _n; x++) {
             for(int y = 0; y < _n; y++) {
                 if(_board.at(Location.create(x, y)) instanceof MineTile) {
                     try {
+                        _board.at(Location.create(x, y)).removeFlag();
                         _board.at(Location.create(x, y)).flip();
                     } catch (GameEndException e) {
-                        // Do nothing.
+                        // Do nothing game is already over.
                     }
                 }
             }
@@ -59,6 +79,11 @@ public class Field {
     }
 
     private void initBoard() {
+        placeMines();
+        placeNumbers();
+    }
+
+    private void placeMines() {
         for (int x = 0; x < _mines; x++) {
             Location randLocation = Location.create((int) Math.floor(Math.random() * _n),
                     (int) Math.floor(Math.random() * _n));
@@ -68,21 +93,64 @@ public class Field {
                         (int) Math.floor(Math.random() * _n));
             }
 
-            _board.putAt(new MineTile(randLocation), randLocation);
+            _board.putAt(new MineTile(), randLocation);
         }
+    }
 
-        for (int x = 0; x < _n; x++) {
-            for (int y = 0; y < _n; y++) {
+    private void placeNumbers() {
+        for(int x = 0; x < _n; x++) {
+            for(int y = 0; y < _n; y++) {
+                int numMines = 0;
 
-                if(_board.at(Location.create(x, y)) == null) {
-                    _board.putAt(new BlankTile(), Location.create(x, y));
+                Location loc = Location.create(x, y);
+
+                if(_board.at(loc) instanceof MineTile) continue;
+
+                if(isValidLocation(loc.up())) {
+                    if(_board.at(loc.up()) instanceof MineTile)
+                        numMines++;
                 }
+                if(isValidLocation(loc.down())) {
+                    if(_board.at(loc.down()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.left())) {
+                    if(_board.at(loc.left()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.right())) {
+                    if(_board.at(loc.right()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.diagonalUpLeft())) {
+                    if(_board.at(loc.diagonalUpLeft()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.diagonalUpRight())) {
+                    if(_board.at(loc.diagonalUpRight()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.diagonalDownLeft())) {
+                    if(_board.at(loc.diagonalDownLeft()) instanceof MineTile)
+                        numMines++;
+                }
+                if(isValidLocation(loc.diagonalDownRight())) {
+                    if(_board.at(loc.diagonalDownRight()) instanceof MineTile)
+                        numMines++;
+                }
+
+
+                if(numMines == 0)
+                    _board.putAt(new BlankTile(), loc);
+                else
+                    _board.putAt(new NumberTile(numMines), loc);
             }
         }
     }
 
     public String print() {
         StringBuilder str = new StringBuilder();
+
 
         for(int x = 0; x < _n; x++) {
             str.append("|");
@@ -96,7 +164,17 @@ public class Field {
         return str.toString();
     }
 
+    public boolean checkIfWon() {
+        for(int x = 0; x < _n; x++) {
+            for(int y=0; y < _n; y++)
+                if(!_board.at(Location.create(x, y)).hasBeenAccessed() && !(_board.at(Location.create(x, y)) instanceof MineTile))
+                    return false;
+        }
+        return true;
+    }
+
     public int size() {
         return _n;
     }
+
 }
