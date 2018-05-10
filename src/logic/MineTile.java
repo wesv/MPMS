@@ -6,14 +6,14 @@ public class MineTile extends Tile {
     private static boolean firstMineHit = false;
 
     public MineTile() {
-        this.thisChar = "M";
+        this.flippedChar = 'M';
     }
 
     @Override
     public void flip() throws GameEndException {
         super.flip();
         if(!firstMineHit)
-            this.thisChar = "m";
+            this.flippedChar = 'm';
         firstMineHit = true;
         throw new GameEndException("You have hit a mine.");
     }

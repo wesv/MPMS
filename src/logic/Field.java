@@ -17,7 +17,8 @@ public class Field {
         _n = boardSize;
         _mines = numMines;
         _board = new Array2D<>(boardSize);
-        initBoard();
+        placeMines();
+        placeNumbers();
     }
 
     public boolean isValidLocation(Location loc) {
@@ -46,7 +47,8 @@ public class Field {
 
         t.flip();
 
-        if(t instanceof BlankTile) {
+        //Flip all surrounding tiles if no surrounding mines
+        if(t instanceof NumberTile && ((NumberTile)t).getNumMines() == 0) {
             flip(l.up());
             flip(l.down());
             flip(l.left());
@@ -65,10 +67,10 @@ public class Field {
     public void flipAllMines() {
         for(int x = 0; x < _n; x++) {
             for(int y = 0; y < _n; y++) {
-                if(_board.at(Location.create(x, y)) instanceof MineTile) {
+                if(_board.at(x, y) instanceof MineTile) {
                     try {
-                        _board.at(Location.create(x, y)).removeFlag();
-                        _board.at(Location.create(x, y)).flip();
+                        _board.at(x, y).removeFlag();
+                        _board.at(x, y).flip();
                     } catch (GameEndException e) {
                         // Do nothing game is already over.
                     }
@@ -76,11 +78,6 @@ public class Field {
             }
         }
 
-    }
-
-    private void initBoard() {
-        placeMines();
-        placeNumbers();
     }
 
     private void placeMines() {
@@ -140,22 +137,19 @@ public class Field {
                 }
 
 
-                if(numMines == 0)
-                    _board.putAt(new BlankTile(), loc);
-                else
-                    _board.putAt(new NumberTile(numMines), loc);
+                _board.putAt(new NumberTile(numMines), loc);
             }
         }
     }
 
-    public String print() {
+    public String toString() {
         StringBuilder str = new StringBuilder();
 
 
         for(int x = 0; x < _n; x++) {
             str.append("|");
             for(int y = 0; y < _n; y++) {
-                str.append(_board.at(Location.create(x, y)).getChar());
+                str.append(_board.at(x, y).toString());
                 if(y != _n)
                     str.append("|");
             }
@@ -167,14 +161,9 @@ public class Field {
     public boolean checkIfWon() {
         for(int x = 0; x < _n; x++) {
             for(int y=0; y < _n; y++)
-                if(!_board.at(Location.create(x, y)).hasBeenAccessed() && !(_board.at(Location.create(x, y)) instanceof MineTile))
+                if(!_board.at(x, y).hasBeenAccessed() && !(_board.at(x, y) instanceof MineTile))
                     return false;
         }
         return true;
     }
-
-    public int size() {
-        return _n;
-    }
-
 }

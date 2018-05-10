@@ -5,15 +5,15 @@ import logic.Field;
 
 import java.util.Scanner;
 
-public class Console implements UserInterface {
+public class Console implements Runnable {
     @Override
-    public void run() throws GameEndException {
-        Field f = new Field(10, 10);
+    public void run() {
+        Field f = new Field(100, 1000);
         Scanner in = new Scanner(System.in);
 
         loop:
         while(true) {
-            System.out.println(f.print());
+            System.out.println(f);
             System.out.print(">> ");
             String[] input = in.nextLine().split(" ");
 
@@ -31,7 +31,7 @@ public class Console implements UserInterface {
                         f.flip(x, y);
                     } catch (GameEndException e) {
                         f.flipAllMines();
-                        System.out.println(f.print());
+                        System.out.println(f);
                         System.out.println("you suck lol");
                         break loop;
                     }

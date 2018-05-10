@@ -13,10 +13,6 @@ public class Location {
         return new Location(x, y);
     }
 
-    public static Location create() {
-        return Location.create(0, 0);
-    }
-
     public Location up() {
         return Location.create(this._x - 1, this._y);
     }

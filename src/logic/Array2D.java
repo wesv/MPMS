@@ -15,6 +15,10 @@ public class Array2D<E> {
         return _elements[l.X()][l.Y()];
     }
 
+    public E at(int x, int y) {
+        return at(Location.create(x, y));
+    }
+
     public void putAt(E element, Location l) {
         _elements[l.X()][l.Y()] = element;
     }
