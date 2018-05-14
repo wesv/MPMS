@@ -5,8 +5,6 @@ public class NumberTile extends Tile {
 
     public NumberTile(int numMines) {
         _surroundingMines = numMines;
-
-        this.flippedChar = (char) ('0' + numMines);
     }
 
     public int getNumMines() {

@@ -7,13 +7,10 @@ import exceptions.GameEndException;
  */
 public abstract class Tile {
 
-    protected char flagChar = '⚑';
+    public static char flagChar = '⚑';
 
     /* Whether this tile has been selected or not */
     protected boolean _accessed;
-
-    /* The character to place when its flipped */
-    protected char flippedChar;
 
     protected boolean _flag;
 
@@ -35,8 +32,6 @@ public abstract class Tile {
      * @return thisChar if accessed, an underscore otherwise.
      */
     public String toString() {
-        if(this.hasBeenAccessed())
-            return "" + flippedChar;
         if(this.isFlagged())
             return "" + flagChar;
         return "_";
@@ -50,12 +45,8 @@ public abstract class Tile {
         _accessed = true;
     }
 
-    public void setFlag() {
-        _flag = true;
-    }
-
-    public void removeFlag() {
-        _flag = false;
+    public void toggleFlag() {
+        _flag = !_flag;
     }
 
     public boolean isFlagged() {

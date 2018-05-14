@@ -8,7 +8,7 @@ import java.util.Scanner;
 public class Console implements Runnable {
     @Override
     public void run() {
-        Field f = new Field(100, 1000);
+        Field f = new ConsoleField(4, 2);
         Scanner in = new Scanner(System.in);
 
         loop:

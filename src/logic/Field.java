@@ -6,11 +6,11 @@ import java.util.Arrays;
 
 public class Field {
     /* The size of the board in nxn */
-    private int _n;
+    protected int _n;
 
     /* The Number of Mines on the board */
-    private int _mines;
-    private Array2D<Tile> _board;
+    protected int _mines;
+    protected Array2D<Tile> _board;
 
 
     public Field(int boardSize, int numMines) {
@@ -21,7 +21,7 @@ public class Field {
         placeNumbers();
     }
 
-    public boolean isValidLocation(Location loc) {
+    protected boolean isValidLocation(Location loc) {
         return loc.X() >= 0 && loc.X() < this._n
                 && loc.Y() >= 0 && loc.Y() < this._n;
     }
@@ -31,10 +31,7 @@ public class Field {
     }
 
     public void flag(Location loc) {
-        if(_board.at(loc).isFlagged())
-            _board.at(loc).removeFlag();
-        else
-            _board.at(loc).setFlag();
+        _board.at(loc).toggleFlag();
     }
 
     public void flip(Location l) throws GameEndException{
@@ -68,12 +65,7 @@ public class Field {
         for(int x = 0; x < _n; x++) {
             for(int y = 0; y < _n; y++) {
                 if(_board.at(x, y) instanceof MineTile) {
-                    try {
-                        _board.at(x, y).removeFlag();
-                        _board.at(x, y).flip();
-                    } catch (GameEndException e) {
-                        // Do nothing game is already over.
-                    }
+                    ((MineTile)_board.at(x,y)).endOfGameFlip();
                 }
             }
         }

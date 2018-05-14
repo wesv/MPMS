@@ -3,18 +3,23 @@ package logic;
 import exceptions.GameEndException;
 
 public class MineTile extends Tile {
-    private static boolean firstMineHit = false;
 
-    public MineTile() {
-        this.flippedChar = 'M';
-    }
+    private boolean normalFlip = false;
 
     @Override
     public void flip() throws GameEndException {
         super.flip();
-        if(!firstMineHit)
-            this.flippedChar = 'm';
-        firstMineHit = true;
+        normalFlip = true;
         throw new GameEndException("You have hit a mine.");
+    }
+
+    public void endOfGameFlip() {
+        _flag = false;
+        _accessed = true;
+    }
+
+    public boolean wasNormallyFlipped()
+    {
+        return normalFlip;
     }
 }
