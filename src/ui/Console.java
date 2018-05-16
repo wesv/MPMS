@@ -2,6 +2,9 @@ package ui;
 
 import exceptions.GameEndException;
 import logic.Field;
+import logic.MineTile;
+import logic.NumberTile;
+import logic.Tile;
 
 import java.util.Scanner;
 
@@ -13,7 +16,7 @@ public class Console implements Runnable {
 
         loop:
         while(true) {
-            System.out.println(f);
+            System.out.println(fieldToString(f));
             System.out.print(">> ");
             String[] input = in.nextLine().split(" ");
 
@@ -31,7 +34,7 @@ public class Console implements Runnable {
                         f.flip(x, y);
                     } catch (GameEndException e) {
                         f.flipAllMines();
-                        System.out.println(f);
+                        System.out.println(fieldToString(f));
                         System.out.println("you suck lol");
                         break loop;
                     }
@@ -47,8 +50,41 @@ public class Console implements Runnable {
             if(f.checkIfWon())
             {
                 System.out.println("YOU WIN!!");
+                System.out.println(f);
                 break;
             }
         }
+    }
+
+    public String fieldToString(Field f) {
+        StringBuilder str = new StringBuilder();
+
+
+        for(int x = 0; x < f.size(); x++) {
+            str.append("|");
+            for(int y = 0; y < f.size(); y++) {
+                str.append(convertMineToString(f.tileAt(x, y)));
+                if(y != f.size())
+                    str.append("|");
+            }
+            str.append("\n");
+        }
+        return str.toString();
+    }
+
+    private String convertMineToString(Tile mine) {
+        if(mine.isFlagged())
+            return Tile.flagChar + "";
+
+        if(mine.hasBeenAccessed()) {
+            if (mine instanceof MineTile) {
+                if(((MineTile)mine).wasNormallyFlipped())
+                    return "\u001B[31mM\u001B[0m"; //Red Text Formatting in ANSI
+                return "M";
+            }
+            if (mine instanceof NumberTile)
+                return ((NumberTile) mine).getNumMines() + "";
+        }
+        return "_";
     }
 }

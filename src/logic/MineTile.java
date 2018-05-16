@@ -22,4 +22,10 @@ public class MineTile extends Tile {
     {
         return normalFlip;
     }
+
+    public String toString() {
+        if(isFlagged())
+            return Tile.flagChar + "";
+        return "M";
+    }
 }

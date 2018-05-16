@@ -158,4 +158,12 @@ public class Field {
         }
         return true;
     }
+
+    public int size() {
+        return _n;
+    }
+
+    public Tile tileAt(int x, int y) {
+        return _board.at(x, y);
+    }
 }
