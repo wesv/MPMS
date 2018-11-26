@@ -11,7 +11,7 @@ import java.util.Scanner;
 public class Console implements Runnable {
     @Override
     public void run() {
-        Field f = new ConsoleField(4, 2);
+        Field f = new Field(4, 2);
         Scanner in = new Scanner(System.in);
 
         loop:
