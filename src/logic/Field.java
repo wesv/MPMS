@@ -2,15 +2,13 @@ package logic;
 
 import exceptions.GameEndException;
 
-import java.util.Arrays;
-
 public class Field {
     /* The size of the board in nxn */
-    protected int _n;
+    private int _n;
 
     /* The Number of Mines on the board */
-    protected int _mines;
-    protected Array2D<Tile> _board;
+    private int _mines;
+    private Array2D<Tile> _board;
 
 
     public Field(int boardSize, int numMines) {
@@ -21,7 +19,7 @@ public class Field {
         placeNumbers();
     }
 
-    protected boolean isValidLocation(Location loc) {
+    private boolean isValidLocation(Location loc) {
         return loc.X() >= 0 && loc.X() < this._n
                 && loc.Y() >= 0 && loc.Y() < this._n;
     }
@@ -30,11 +28,11 @@ public class Field {
         flag(Location.create(x, y));
     }
 
-    public void flag(Location loc) {
+    private void flag(Location loc) {
         _board.at(loc).toggleFlag();
     }
 
-    public void flip(Location l) throws GameEndException{
+    private void flip(Location l) throws GameEndException{
 
         if(!isValidLocation(l)) return;
 
@@ -70,6 +68,10 @@ public class Field {
             }
         }
 
+    }
+
+    public Tile getTileAt(int x, int y) {
+        return _board.at(x, y);
     }
 
     private void placeMines() {
@@ -152,9 +154,14 @@ public class Field {
 
     public boolean checkIfWon() {
         for(int x = 0; x < _n; x++) {
-            for(int y=0; y < _n; y++)
-                if(!_board.at(x, y).hasBeenAccessed() && !(_board.at(x, y) instanceof MineTile))
+            for(int y=0; y < _n; y++) {
+                Tile tile = _board.at(x, y);
+
+                if(tile instanceof MineTile && !tile.isFlagged())
                     return false;
+                if(tile instanceof NumberTile && !tile.hasBeenAccessed())
+                    return false;
+            }
         }
         return true;
     }

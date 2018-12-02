@@ -12,6 +12,7 @@ public abstract class Tile {
     /* Whether this tile has been selected or not */
     protected boolean _accessed;
 
+    /* Whether this tile is flagged or not */
     protected boolean _flag;
 
     /**
@@ -45,7 +46,7 @@ public abstract class Tile {
         _accessed = true;
     }
 
-    public void toggleFlag() {
+    void toggleFlag() {
         _flag = !_flag;
     }
 

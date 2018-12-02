@@ -2,9 +2,9 @@ package ui;
 
 
 public class Model {
-    static int UNFLIPPED = -1;
-    static int FLAGGED = -2;
-    static int FLIPPED = 0;
+    static final int UNFLIPPED = -1;
+    static final int FLAGGED = -2;
+    static final int MINE = -3;
 
     private int[][] tileStatus;
 
@@ -17,15 +17,15 @@ public class Model {
         }
     }
 
-    public void setTile(int row, int col, int status) {
+    void setStatus(int row, int col, int status) {
         tileStatus[row][col] = status;
     }
 
-    public int getStatus(int row, int col) {
+    int getStatus(int row, int col) {
         return tileStatus[row][col];
     }
 
-    public int getSize() {
+    int getSize() {
         return tileStatus.length;
     }
 }
