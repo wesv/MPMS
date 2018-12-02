@@ -1,6 +1,7 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -27,8 +28,16 @@ public class SwingView implements View{
         JPanel panel = new JPanel(new BorderLayout());
 
 
-
         changeField(size);
+        field.setBorder(new CompoundBorder(
+                BorderFactory.createEmptyBorder(35, 35, 35, 35), //TODO set top to 0
+                new CompoundBorder(
+                        BorderFactory.createMatteBorder(0, 0, 2, 2, new Color(113, 113, 113)),
+                        BorderFactory.createMatteBorder(2, 2, 0, 0, Color.WHITE)
+                )
+
+        ));
+        field.setBackground(new Color(192, 192, 192));
 
         panel.add(field, BorderLayout.CENTER);
 
@@ -53,22 +62,22 @@ public class SwingView implements View{
 
         for(JButton[] row: tiles) {
             for(JButton col: row) {
+                outdentTile(col);
                 col.setPreferredSize(new Dimension(500 / size, 500 / size));
-                col.setBackground(new Color(127, 127, 127));
                 col.addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
+                        //TODO add reference in order to remove event later
                         super.mouseClicked(e);
 
-                        System.out.println(_tilesCanBeClicked);
                         if(_tilesCanBeClicked) {
 
                             boolean toFlag = false;
-                            System.out.println(e.getButton());
                             if (e.getButton() > 1) {
                                 toFlag = true;
                             }
 
+                            //TODO create custom button to remove this loop
                             for (int i = 0; i < size; i++) {
                                 for (int j = 0; j < size; j++) {
                                     if (tiles[i][j] == e.getSource())
@@ -87,6 +96,19 @@ public class SwingView implements View{
         }
     }
 
+    private void outdentTile(JButton but) {
+        but.setBorder(new CompoundBorder(
+                BorderFactory.createMatteBorder(1, 1, 0, 0, Color.WHITE),
+                BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(113, 113, 113))
+        ));
+        but.setBackground(new Color(192, 192, 192));
+    }
+
+    private void indentTile(JButton but) {
+        but.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123)));
+        but.setBackground(new Color(189, 189, 189));
+    }
+
     public void updateTiles(Model m) {
         for(int x = 0; x < tiles.length; x++) {
             for (int y = 0; y < tiles.length; y++) {
@@ -97,12 +119,14 @@ public class SwingView implements View{
                         break;
                     case Model.MINE:
                         tiles[x][y].setText("M");
+                        indentTile(tiles[x][y]);
                         break;
                     case Model.UNFLIPPED:
                         tiles[x][y].setText("");
                         break;
                     default:
                         tiles[x][y].setText(""+ status);
+                        indentTile(tiles[x][y]);
 
                 }
             }
