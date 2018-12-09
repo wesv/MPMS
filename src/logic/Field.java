@@ -11,9 +11,10 @@ public class Field {
     private Array2D<Tile> _board;
 
 
-    public Field(int boardSize, int numMines) {
+    public Field(int boardSize, double mineDensity) {
         _n = boardSize;
-        _mines = numMines;
+        if(mineDensity >= 1 || mineDensity <= 0) throw new RuntimeException("Mine Density is an invalid value ( "+ mineDensity +")");
+        _mines = (int)Math.floor(boardSize * boardSize * mineDensity) + 1;
         _board = new Array2D<>(boardSize);
         placeMines();
         placeNumbers();
@@ -24,15 +25,15 @@ public class Field {
                 && loc.Y() >= 0 && loc.Y() < this._n;
     }
 
-    public void flag(int x, int y) {
+    /*public void flag(int x, int y) {
         flag(Location.create(x, y));
-    }
+    }*/
 
-    private void flag(Location loc) {
+    public void flag(Location loc) {
         _board.at(loc).toggleFlag();
     }
 
-    private void flip(Location l) throws GameEndException{
+    public void flip(Location l) throws GameEndException {
 
         if(!isValidLocation(l)) return;
 
@@ -55,9 +56,9 @@ public class Field {
         }
     }
 
-    public void flip(int x, int y) throws GameEndException {
+    /*public void flip(int x, int y) throws GameEndException {
         flip(Location.create(x, y));
-    }
+    }*/
 
     public void flipAllMines() {
         for(int x = 0; x < _n; x++) {
@@ -70,8 +71,8 @@ public class Field {
 
     }
 
-    public Tile getTileAt(int x, int y) {
-        return _board.at(x, y);
+    public Tile getTileAt(Location l) {
+        return _board.at(l);
     }
 
     private void placeMines() {

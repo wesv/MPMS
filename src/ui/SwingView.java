@@ -1,18 +1,26 @@
 package ui;
 
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 
 public class SwingView implements View{
-    private Controller _c;
+    private ImageIcon _minePic = new ImageIcon("resources/mine.png");
+    private ImageIcon _flagPic = new ImageIcon("resources/flag.png");
+
+    private Color _indentedColor = new Color(189, 189, 189);
+    private Color _unindentedColor = new Color(192, 192, 192);
+
+    private Controller _controller;
     private boolean _tilesCanBeClicked;
 
-    private JPanel field;
-    private JButton[][] tiles;
+    private JPanel _field;
+    private TileButton[][] _tiles;
 
 
     public void init(int width, int height) {
@@ -28,113 +36,137 @@ public class SwingView implements View{
         JPanel panel = new JPanel(new BorderLayout());
 
 
-        changeField(size);
-        field.setBorder(new CompoundBorder(
-                BorderFactory.createEmptyBorder(35, 35, 35, 35), //TODO set top to 0
+        initField(size);
+        _field.setBorder(new CompoundBorder(
+                BorderFactory.createEmptyBorder(35, 35, 35, 35),
                 new CompoundBorder(
                         BorderFactory.createMatteBorder(0, 0, 2, 2, new Color(113, 113, 113)),
                         BorderFactory.createMatteBorder(2, 2, 0, 0, Color.WHITE)
                 )
 
         ));
-        field.setBackground(new Color(192, 192, 192));
+        _field.setBackground(new Color(192, 192, 192));
 
-        panel.add(field, BorderLayout.CENTER);
+        panel.add(_field, BorderLayout.CENTER);
 
 
         frame.add(panel);
 
+        frame.setResizable(false);
         frame.pack();
         frame.setVisible(true);
 
     }
 
-    private void changeField(int size) {
-        field = new JPanel(new GridLayout(size, size));
-        tiles = new JButton[size][size];
+    private void initField(int size) {
+        _field = new JPanel(new GridLayout(size, size));
+        _tiles = new TileButton[size][size];
+        Dimension tileSize = new Dimension(500 / size, 500 / size);
+
+        //Rescale Pictures to match the size of the tiles
+        Image newMineImg = _minePic.getImage().getScaledInstance(
+                (int)tileSize.getWidth(),
+                (int)tileSize.getHeight(),
+                Image.SCALE_SMOOTH);
+        _minePic = new ImageIcon(newMineImg);
+
+        Image newFlagImg = _flagPic.getImage().getScaledInstance(
+                (int)tileSize.getWidth(),
+                (int)tileSize.getHeight(),
+                Image.SCALE_SMOOTH);
+
+        _flagPic = new ImageIcon(newFlagImg);
 
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                tiles[i][j] = new JButton();
-            }
-        }
+                _tiles[i][j] = new TileButton(new logic.Location(i, j));
 
-
-        for(JButton[] row: tiles) {
-            for(JButton col: row) {
-                outdentTile(col);
-                col.setPreferredSize(new Dimension(500 / size, 500 / size));
-                col.addMouseListener(new MouseAdapter() {
+                _tiles[i][j].unindent();
+                _tiles[i][j].setPreferredSize(tileSize);
+                _tiles[i][j].addMouseListener(new MouseAdapter() {
                     @Override
                     public void mouseClicked(MouseEvent e) {
-                        //TODO add reference in order to remove event later
                         super.mouseClicked(e);
 
                         if(_tilesCanBeClicked) {
-
-                            boolean toFlag = false;
-                            if (e.getButton() > 1) {
-                                toFlag = true;
-                            }
-
-                            //TODO create custom button to remove this loop
-                            for (int i = 0; i < size; i++) {
-                                for (int j = 0; j < size; j++) {
-                                    if (tiles[i][j] == e.getSource())
-                                        if (toFlag)
-                                            _c.flag(i, j);
-                                        else
-                                            _c.flip(i, j);
-                                }
-                            }
+                            if (e.getButton() == 1) // Left Click
+                                _controller.flip(((TileButton)e.getSource()).getGridLocation());
+                            else
+                                _controller.flag(((TileButton)e.getSource()).getGridLocation());
                         }
                     }
                 });
 
-                field.add(col);
+                _field.add(_tiles[i][j]);
             }
         }
+
     }
 
-    private void outdentTile(JButton but) {
-        but.setBorder(new CompoundBorder(
-                BorderFactory.createMatteBorder(1, 1, 0, 0, Color.WHITE),
-                BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(113, 113, 113))
-        ));
-        but.setBackground(new Color(192, 192, 192));
-    }
+    /**
+     * Mix the images used for the mine and the flag to show which mines you flagged correctly.
+     * The flag icon will be on top of the mine icon.
+     *
+     * @return an ImageIcon mixing the 2 images together.
+     */
+    private ImageIcon mixFlagAndMineImages() {
+        // These 2 images have the same dimensions as defined in the initField method
+        Image mine = _minePic.getImage();
+        Image flag = _flagPic.getImage();
 
-    private void indentTile(JButton but) {
-        but.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123)));
-        but.setBackground(new Color(189, 189, 189));
+        int width = mine.getWidth(null);
+        int height= mine.getHeight(null);
+
+        BufferedImage combined = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics g = combined.getGraphics();
+
+        g.drawImage(mine, 0, 0, null);
+        g.drawImage(flag, 0, 0, null);
+
+        return new ImageIcon(combined);
     }
 
     public void updateTiles(Model m) {
-        for(int x = 0; x < tiles.length; x++) {
-            for (int y = 0; y < tiles.length; y++) {
+        for(int x = 0; x < _tiles.length; x++) {
+            for (int y = 0; y < _tiles[x].length; y++) {
                 int status = m.getStatus(x, y);
                 switch(status) {
                     case Model.FLAGGED:
-                        tiles[x][y].setText("F");
+                        _tiles[x][y].setIcon(_flagPic);
                         break;
                     case Model.MINE:
-                        tiles[x][y].setText("M");
-                        indentTile(tiles[x][y]);
+                        _tiles[x][y].setIcon(_minePic);
+                        _tiles[x][y].indent();
+                        break;
+                    case Model.CLICKED_MINE:
+                        _tiles[x][y].setIcon(_minePic);
+                        _tiles[x][y].indent();
+                        _tiles[x][y].setBackground(Color.RED);
+                        break;
+                    case Model.FLAGGED_MINE:
+                        _tiles[x][y].setIcon(mixFlagAndMineImages());
+                        _tiles[x][y].indent();
                         break;
                     case Model.UNFLIPPED:
-                        tiles[x][y].setText("");
+                        _tiles[x][y].setText("");
+                        _tiles[x][y].setIcon(null);
+                        _tiles[x][y].unindent();
+                        break;
+                    case 0:
+                        _tiles[x][y].setText("");
+                        _tiles[x][y].indent();
                         break;
                     default:
-                        tiles[x][y].setText(""+ status);
-                        indentTile(tiles[x][y]);
-
+                        _tiles[x][y].setText(""+ status);
+                        _tiles[x][y].indent();
                 }
             }
         }
     }
 
     public void setController(Controller controller) {
-        _c = controller;
+        _controller = controller;
     }
 
     public void endGame(Controller.GameEndReasons reasons) {
@@ -151,5 +183,74 @@ public class SwingView implements View{
         endOfGameText.append("\n\n Would you like to play once more?");
         int response = JOptionPane.showConfirmDialog(null, endOfGameText, "Game Over", JOptionPane.YES_NO_OPTION);
         _tilesCanBeClicked = false;
+    }
+
+    /**
+     * Custom button to be the tiles on the Minesweeper Grid.
+     */
+    private class TileButton extends JButton {
+        /* The location of the button in the grid */
+        private logic.Location loc;
+
+        /* The borders used for when its clicked/not clicked */
+        private Border unindentedBorder;
+        private Border indentedBorder;
+
+        TileButton(logic.Location l) {
+            this.loc = l;
+
+            this.setFocusPainted(false);
+
+            //Set Area to False so we can draw our own Fill
+            super.setContentAreaFilled(false);
+
+            unindentedBorder = new CompoundBorder(
+                    BorderFactory.createMatteBorder(1, 1, 0, 0, Color.WHITE),
+                    BorderFactory.createMatteBorder(0, 0, 1, 1, new Color(113, 113, 113))
+            );
+
+            indentedBorder = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123));
+        }
+
+        logic.Location getGridLocation() {
+            return loc;
+        }
+
+        void unindent() {
+            this.setBorder(unindentedBorder);
+            this.setBackground(_unindentedColor);
+        }
+
+        void indent() {
+            this.setBorder(indentedBorder);
+            this.setBackground(_indentedColor);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+
+            if(getModel().isPressed()) {
+                g.setColor(_indentedColor);
+            } else {
+                g.setColor(getBackground());
+            }
+            
+            g.fillRect(0, 0, getWidth(), getHeight());
+            super.paintComponent(g);
+
+        }
+
+        @Override
+        protected void paintBorder(Graphics g) {
+            super.paintBorder(g);
+            
+            if(getModel().isPressed()) {
+                indentedBorder.paintBorder(this, g, 0, 0, getWidth(), getHeight());
+            }
+        }
+
+        @Override
+        public void setContentAreaFilled(boolean b) {
+        }
     }
 }

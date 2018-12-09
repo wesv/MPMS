@@ -5,6 +5,8 @@ public class Model {
     static final int UNFLIPPED = -1;
     static final int FLAGGED = -2;
     static final int MINE = -3;
+    static final int CLICKED_MINE = -4;
+    static final int FLAGGED_MINE = -5;
 
     private int[][] tileStatus;
 

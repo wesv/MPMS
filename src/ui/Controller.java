@@ -17,16 +17,16 @@ public class Controller {
         model = m;
         view = v;
         v.setController(this);
-        field = new Field(m.getSize(), m.getSize());
+        field = new Field(m.getSize(), 0.05);
     }
 
     public void start() {
         view.init(model.getSize(), model.getSize());
     }
 
-    public void flip(int row, int col) {
+    public void flip(Location pos) {
         try {
-            field.flip(row, col);
+            field.flip(pos);
         } catch (GameEndException e) {
             view.endGame(GameEndReasons.HIT_MINE);
             field.flipAllMines();
@@ -35,8 +35,8 @@ public class Controller {
         update();
     }
 
-    public void flag(int i, int j) {
-        field.flag(i, j);
+    public void flag(Location position) {
+        field.flag(position);
 
         update();
     }
@@ -53,11 +53,17 @@ public class Controller {
     private void updateModel() {
         for(int x = 0; x < model.getSize(); x++) {
             for(int y = 0; y < model.getSize(); y++) {
-                Tile t = field.getTileAt(x, y);
+                Tile t = field.getTileAt(new Location(x, y));
 
                 if(t.hasBeenAccessed()) {
-                    if (t instanceof MineTile)
-                        model.setStatus(x, y, Model.MINE);
+                    if (t instanceof MineTile) {
+                        if (((MineTile) t).wasNormallyFlipped())
+                            model.setStatus(x, y, Model.CLICKED_MINE);
+                        else if (t.isFlagged())
+                            model.setStatus(x, y, Model.FLAGGED_MINE);
+                        else
+                            model.setStatus(x, y, Model.MINE);
+                    }
                     else if (t instanceof NumberTile)
                         model.setStatus(x, y, ((NumberTile) t).getNumMines());
                 }

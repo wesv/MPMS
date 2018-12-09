@@ -31,7 +31,7 @@ public class Console implements Runnable {
             switch(input[0].toLowerCase()) {
                 case "flip":
                     try {
-                        f.flip(x, y);
+                        f.flip(new logic.Location(x, y));
                     } catch (GameEndException e) {
                         f.flipAllMines();
                         System.out.println(fieldToString(f));
@@ -40,7 +40,7 @@ public class Console implements Runnable {
                     }
                     break;
                 case "flag":
-                    f.flag(x, y);
+                    f.flag(new logic.Location(x, y));
                     break;
                 default:
                     System.out.println("Command Not Recognized");

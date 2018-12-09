@@ -14,7 +14,6 @@ public class MineTile extends Tile {
     }
 
     public void endOfGameFlip() {
-        _flag = false;
         _accessed = true;
     }
 
