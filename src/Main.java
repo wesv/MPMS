@@ -2,10 +2,6 @@ import ui.*;
 
 public class Main {
     public static void main(String[] args) {
-        Model m = new Model(3);
-        SwingView v = new SwingView();
-        Controller c = new Controller(v, m);
-
-        c.start();
+        Controller.launchNewGame(10, 0.15, new SwingView());
     }
 }

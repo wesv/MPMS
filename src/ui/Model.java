@@ -10,7 +10,10 @@ public class Model {
 
     private int[][] tileStatus;
 
-    public Model(int size) {
+    /**
+     * @param size the size of the grid. The grid is a square with side length of size
+     */
+    Model(int size) {
         tileStatus = new int[size][size];
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {

@@ -10,26 +10,34 @@ public class Controller {
     }
 
     private Model model;
-    private SwingView view;
+    private View view;
     private Field field;
 
-    public Controller(SwingView v, Model m) {
+    private Controller(View v, Model m, double mineDensity) {
         model = m;
         view = v;
         v.setController(this);
-        field = new Field(m.getSize(), 0.05);
+        field = new Field(m.getSize(), mineDensity);
     }
 
-    public void start() {
+    private void start() {
         view.init(model.getSize(), model.getSize());
+    }
+
+    public static void launchNewGame(int size, double mineDensity, View newView) {
+        Model newModel = new Model(size);
+        Controller newController = new Controller(newView, newModel, mineDensity);
+
+        new Thread(newController::start).start();
     }
 
     public void flip(Location pos) {
         try {
             field.flip(pos);
         } catch (GameEndException e) {
-            view.endGame(GameEndReasons.HIT_MINE);
             field.flipAllMines();
+            update();
+            view.endGame(GameEndReasons.HIT_MINE);
         }
 
         update();

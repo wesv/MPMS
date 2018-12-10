@@ -6,6 +6,7 @@ import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 
@@ -19,6 +20,7 @@ public class SwingView implements View{
     private Controller _controller;
     private boolean _tilesCanBeClicked;
 
+    private JFrame _frame;
     private JPanel _field;
     private TileButton[][] _tiles;
 
@@ -31,8 +33,8 @@ public class SwingView implements View{
         ResourceBundle strings = ResourceBundle.getBundle("ui.strings");
         _tilesCanBeClicked = true;
 
-        JFrame frame = new JFrame(strings.getString("title"));
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        _frame = new JFrame(strings.getString("title"));
+        _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel(new BorderLayout());
 
 
@@ -50,11 +52,11 @@ public class SwingView implements View{
         panel.add(_field, BorderLayout.CENTER);
 
 
-        frame.add(panel);
+        _frame.add(panel);
 
-        frame.setResizable(false);
-        frame.pack();
-        frame.setVisible(true);
+        _frame.setResizable(false);
+        _frame.pack();
+        _frame.setVisible(true);
 
     }
 
@@ -84,15 +86,24 @@ public class SwingView implements View{
                 _tiles[i][j].unindent();
                 _tiles[i][j].setPreferredSize(tileSize);
                 _tiles[i][j].addMouseListener(new MouseAdapter() {
+                    private boolean _pressed = false;
+
                     @Override
-                    public void mouseClicked(MouseEvent e) {
+                    public void mouseReleased(MouseEvent e) {
                         super.mouseClicked(e);
 
-                        if(_tilesCanBeClicked) {
-                            if (e.getButton() == 1) // Left Click
-                                _controller.flip(((TileButton)e.getSource()).getGridLocation());
-                            else
-                                _controller.flag(((TileButton)e.getSource()).getGridLocation());
+                        if(new Rectangle(e.getComponent().getLocationOnScreen(),
+                                         e.getComponent().getSize())
+                                .contains(e.getLocationOnScreen()))
+                        {
+
+                            if (_tilesCanBeClicked) {
+                                if (e.getButton() > 1) // Right  Click
+                                    _controller.flag(((TileButton) e.getSource()).getGridLocation());
+                                else
+                                    _controller.flip(((TileButton) e.getSource()).getGridLocation());
+                                _pressed = false;
+                            }
                         }
                     }
                 });
@@ -170,9 +181,11 @@ public class SwingView implements View{
     }
 
     public void endGame(Controller.GameEndReasons reasons) {
+        _tilesCanBeClicked = false;
+
         StringBuilder endOfGameText = new StringBuilder();
 
-        switch(reasons) {
+        switch (reasons) {
             case WIN:
                 endOfGameText.append("You win! Congrats!");
                 break;
@@ -182,9 +195,14 @@ public class SwingView implements View{
         }
         endOfGameText.append("\n\n Would you like to play once more?");
         int response = JOptionPane.showConfirmDialog(null, endOfGameText, "Game Over", JOptionPane.YES_NO_OPTION);
-        _tilesCanBeClicked = false;
-    }
 
+
+        if (response == JOptionPane.YES_OPTION) {
+            _frame.setVisible(false);
+            Controller.launchNewGame(this._tiles.length, 0.15, new SwingView());
+        }
+        _frame.dispatchEvent(new WindowEvent(_frame, WindowEvent.WINDOW_CLOSING));
+    }
     /**
      * Custom button to be the tiles on the Minesweeper Grid.
      */
