@@ -36,21 +36,41 @@ public class SwingView implements View{
         _frame = new JFrame(strings.getString("title"));
         _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel(new BorderLayout());
+        JPanel topRow = new JPanel(new FlowLayout(FlowLayout.LEFT));
 
+        Color backgroundColor = new Color(192, 192, 192);
 
         initField(size);
         _field.setBorder(new CompoundBorder(
-                BorderFactory.createEmptyBorder(35, 35, 35, 35),
+                BorderFactory.createEmptyBorder(0, 35, 35, 35),
                 new CompoundBorder(
                         BorderFactory.createMatteBorder(0, 0, 2, 2, new Color(113, 113, 113)),
                         BorderFactory.createMatteBorder(2, 2, 0, 0, Color.WHITE)
                 )
 
         ));
-        _field.setBackground(new Color(192, 192, 192));
+        _field.setBackground(backgroundColor);
+
+        JLabel mineCountLabel = new JLabel("10");
+        mineCountLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, 30));
+        mineCountLabel.setHorizontalAlignment(JLabel.LEFT);
+        mineCountLabel.setAlignmentX(JLabel.LEFT_ALIGNMENT);
+        //mineCountLabel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 100));
+
+        TileButton restartButton = new TileButton(new logic.Location(-1, -1));
+        restartButton.setPreferredSize(new Dimension(40, 40));
+        restartButton.unindent();
+        restartButton.setAlignmentX(0.0f);
+
+        topRow.setAlignmentX(0.0f);
+        topRow.add(mineCountLabel);
+        topRow.setSize(550, 50);
+        topRow.setPreferredSize(new Dimension(550, 50));
+        topRow.add(restartButton);
+        topRow.setBackground(Color.WHITE);
 
         panel.add(_field, BorderLayout.CENTER);
-
+        panel.add(topRow, BorderLayout.NORTH);
 
         _frame.add(panel);
 
@@ -86,8 +106,6 @@ public class SwingView implements View{
                 _tiles[i][j].unindent();
                 _tiles[i][j].setPreferredSize(tileSize);
                 _tiles[i][j].addMouseListener(new MouseAdapter() {
-                    private boolean _pressed = false;
-
                     @Override
                     public void mouseReleased(MouseEvent e) {
                         super.mouseClicked(e);
@@ -102,7 +120,6 @@ public class SwingView implements View{
                                     _controller.flag(((TileButton) e.getSource()).getGridLocation());
                                 else
                                     _controller.flip(((TileButton) e.getSource()).getGridLocation());
-                                _pressed = false;
                             }
                         }
                     }
