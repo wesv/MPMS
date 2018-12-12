@@ -6,41 +6,61 @@ import logic.*;
 public class Controller {
 
     public enum GameEndReasons {
-        HIT_MINE, WIN
+        HIT_MINE, WIN, RESTART
     }
 
     private Model model;
     private View view;
     private Field field;
 
-    private Controller(View v, Model m, double mineDensity) {
-        model = m;
+    private double _density;
+
+    public Controller(int size, double mineDensity, View v) {
+        this._density = mineDensity;
+        field = new Field(size, mineDensity);
+        model = new Model(size, field.numMines());
         view = v;
         v.setController(this);
-        field = new Field(m.getSize(), mineDensity);
+
     }
 
-    private void start() {
+    public void start() {
         view.init(model.getSize(), model.getSize());
+        view.updateTiles(model);
     }
 
+    public void restart() {
+        int size = model.getSize();
+        field = new Field(size, _density);
+        model = new Model(size, field.numMines());
+        view.updateTiles(model);
+    }
+
+    /**
+     * Launch a new game with a different size and density.
+     * @param size The size of hte grid. The grid is a square with a length of size
+     * @param mineDensity A percentage for how many mines there should be in the grid
+     * @param newView The view to use this controller on.
+     */
     public static void launchNewGame(int size, double mineDensity, View newView) {
-        Model newModel = new Model(size);
-        Controller newController = new Controller(newView, newModel, mineDensity);
+        Controller newController = new Controller(size, mineDensity, newView);
 
         new Thread(newController::start).start();
     }
 
-    public void flip(Location pos) {
+    /**
+     * Flips the mine on the grid at position <code>pos</code>
+     * @param pos
+     */
+    void flip(Location pos) {
         try {
             field.flip(pos);
+            update();
         } catch (GameEndException e) {
             field.flipAllMines();
             update();
             view.endGame(GameEndReasons.HIT_MINE);
         }
-
-        update();
     }
 
     public void flag(Location position) {

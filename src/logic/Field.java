@@ -25,10 +25,6 @@ public class Field {
                 && loc.Y() >= 0 && loc.Y() < this._n;
     }
 
-    /*public void flag(int x, int y) {
-        flag(Location.create(x, y));
-    }*/
-
     public void flag(Location loc) {
         _board.at(loc).toggleFlag();
     }
@@ -169,6 +165,9 @@ public class Field {
 
     public int size() {
         return _n;
+    }
+    public int numMines() {
+        return _mines;
     }
 
     public Tile tileAt(int x, int y) {
