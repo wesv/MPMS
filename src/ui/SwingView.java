@@ -38,6 +38,7 @@ public class SwingView implements View{
 
         /* constants used for the UI */
         final int borderWidth = 35;
+        final int rowHeight = 60;
 
         _frame = new JFrame(strings.getString("title"));
         _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -46,7 +47,7 @@ public class SwingView implements View{
 
         Color backgroundColor = new Color(192, 192, 192);
 
-        initField(size);
+        _field = createField(size, size);
         _field.setBorder(new CompoundBorder(
                 BorderFactory.createEmptyBorder(0, borderWidth, borderWidth, borderWidth),
                 new CompoundBorder(
@@ -58,10 +59,8 @@ public class SwingView implements View{
         _field.setBackground(backgroundColor);
 
 
-        final int rowHeight = 60;
-
-    /* Create the Label Stating the number of mines left to find */
-        mineCountLabel = new JLabel("0");
+        /* Create the Label Stating the number of mines left to find */
+        mineCountLabel = new JLabel("");
         mineCountLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, 30));
         mineCountLabel.setPreferredSize(new Dimension(50, rowHeight));
         mineCountLabel.setBackground(Color.WHITE);
@@ -72,10 +71,10 @@ public class SwingView implements View{
         labelConstraint.gridheight = 1;
         labelConstraint.insets = new Insets(0, borderWidth, 0, 0);
         labelConstraint.anchor = GridBagConstraints.LINE_START;
-        labelConstraint.fill = GridBagConstraints.HORIZONTAL;
         topRow.add(mineCountLabel, labelConstraint);
 
 
+        /* Create a label to display time taken */
         JLabel timerLabel = new JLabel("0");
         timerLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, 30));
         timerLabel.setPreferredSize(new Dimension(50, rowHeight));
@@ -89,12 +88,14 @@ public class SwingView implements View{
         timerConstraint.anchor = GridBagConstraints.CENTER;
         topRow.add(timerLabel, timerConstraint);
 
+        /* Create the button that restarts the game when clicked */
         TileButton restartButton = new TileButton(new logic.Location(-1, -1));
         restartButton.setPreferredSize(new Dimension(40, 40));
         restartButton.unindent();
         restartButton.addMouseListener(new MouseAdapter() {
             @Override
-            public void mousePressed(MouseEvent e) {
+            public void mouseReleased(MouseEvent e) {
+                // If the mouse is still in bounds of the button when clicked */
                 if(new Rectangle(e.getComponent().getLocationOnScreen(), e.getComponent().getSize()).contains(e.getLocationOnScreen())) {
                     _controller.restart();
                     _tilesCanBeClicked = true;
@@ -121,37 +122,25 @@ public class SwingView implements View{
         panel.add(_field, BorderLayout.CENTER);
         panel.add(topRow, BorderLayout.NORTH);
 
-
         _frame.add(panel);
 
-        //_frame.setResizable(false);
         _frame.pack();
         _frame.setMinimumSize(new Dimension(_frame.getWidth(), _frame.getHeight()));
         _frame.setVisible(true);
 
     }
 
-    private void initField(int size) {
-        _field = new JPanel(new GridLayout(size, size));
-        _tiles = new TileButton[size][size];
-        Dimension tileSize = new Dimension(boardWidth / size, boardWidth / size);
+    private JPanel createField(int x, int y) {
+        JPanel field = new JPanel(new GridLayout(x, y));
+        _tiles = new TileButton[x][y];
+        Dimension tileSize = new Dimension(boardWidth / x, boardWidth / x);
 
         //Rescale Pictures to match the size of the tiles
-        Image newMineImg = _minePic.getImage().getScaledInstance(
-                (int)tileSize.getWidth(),
-                (int)tileSize.getHeight(),
-                Image.SCALE_SMOOTH);
-        _minePic = new ImageIcon(newMineImg);
+        _minePic = resizeIcon(_minePic, tileSize);
+        _flagPic = resizeIcon(_flagPic, tileSize);
 
-        Image newFlagImg = _flagPic.getImage().getScaledInstance(
-                (int)tileSize.getWidth(),
-                (int)tileSize.getHeight(),
-                Image.SCALE_SMOOTH);
-
-        _flagPic = new ImageIcon(newFlagImg);
-
-        for(int i = 0; i < size; i++) {
-            for(int j = 0; j < size; j++) {
+        for(int i = 0; i < x; i++) {
+            for(int j = 0; j < y; j++) {
                 _tiles[i][j] = new TileButton(new logic.Location(i, j));
 
                 _tiles[i][j].unindent();
@@ -161,12 +150,11 @@ public class SwingView implements View{
                     public void mouseReleased(MouseEvent e) {
                         super.mouseClicked(e);
 
+                        //If the mouse is still in bounds of the button after its Released
                         if(new Rectangle(e.getComponent().getLocationOnScreen(),
                                          e.getComponent().getSize())
-                                .contains(e.getLocationOnScreen()))
-                        {
-
-                            if (_tilesCanBeClicked) {
+                                .contains(e.getLocationOnScreen())) {
+                             if (_tilesCanBeClicked) {
                                 if (e.getButton() > 1) // Right  Click
                                     _controller.flag(((TileButton) e.getSource()).getGridLocation());
                                 else
@@ -176,10 +164,18 @@ public class SwingView implements View{
                     }
                 });
 
-                _field.add(_tiles[i][j]);
+                field.add(_tiles[i][j]);
             }
         }
+        return field;
+    }
 
+    private ImageIcon resizeIcon(ImageIcon pic, Dimension size) {
+        Image newImg = pic.getImage().getScaledInstance(
+                (int)size.getWidth(),
+                (int)size.getHeight(),
+                Image.SCALE_SMOOTH);
+        return new ImageIcon(newImg);
     }
 
     /**
@@ -189,7 +185,7 @@ public class SwingView implements View{
      * @return an ImageIcon mixing the 2 images together.
      */
     private ImageIcon mixFlagAndMineImages() {
-        // These 2 images have the same dimensions as defined in the initField method
+        // These 2 images have the same dimensions as defined in the createField method
         Image mine = _minePic.getImage();
         Image flag = _flagPic.getImage();
 
