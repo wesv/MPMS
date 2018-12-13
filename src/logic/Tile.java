@@ -1,7 +1,5 @@
 package logic;
 
-import exceptions.GameEndException;
-
 /**
  * The outline for any Tile. The board is filled with tiles.
  */
@@ -16,10 +14,11 @@ public abstract class Tile {
     protected boolean _flag;
 
     /**
-     * This method returns true if the flip method for this class has
-     * been called, false otherwise.
+     * This method returns <code>true</code> if the flip method for this class has
+     * been called, <code>false</code> otherwise.
      *
-     * @return whether this object has been accessed or not.
+     * @return Whether this object has been accessed or not.
+     * @see Tile#flip()
      */
     public boolean hasBeenAccessed() {
         return _accessed;
@@ -39,11 +38,12 @@ public abstract class Tile {
     }
 
     /**
-     *  Flips a tile over and sets hasBeenAccessed to true
-     * @throws GameEndException if the game ends due to flipping this tile (ie hitting a mine)
+     *  Flips a tile over. More specifically, this method sets <code>hasBeenAccessed</code> to true.
+     * @return If the tile clicked on should end the game. This method will always return false and subclasses should overwrite this method to set it to true.
      */
-    public void flip() throws GameEndException {
+    public boolean flip() {
         _accessed = true;
+        return false;
     }
 
     void toggleFlag() {

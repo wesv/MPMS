@@ -58,7 +58,7 @@ public class SwingView implements View{
         _field.setBackground(backgroundColor);
 
 
-        final int rowHeight = 50;
+        final int rowHeight = 60;
 
     /* Create the Label Stating the number of mines left to find */
         mineCountLabel = new JLabel("0");
@@ -97,6 +97,7 @@ public class SwingView implements View{
             public void mousePressed(MouseEvent e) {
                 if(new Rectangle(e.getComponent().getLocationOnScreen(), e.getComponent().getSize()).contains(e.getLocationOnScreen())) {
                     _controller.restart();
+                    _tilesCanBeClicked = true;
                 }
             }
         });
@@ -255,6 +256,9 @@ public class SwingView implements View{
 
     public void endGame(Controller.GameEndReasons reasons) {
         _tilesCanBeClicked = false;
+        if(reasons == Controller.GameEndReasons.WIN) {
+            JOptionPane.showMessageDialog(null, "You did it!! \n You got a score of TODO", "Congrats", JOptionPane.INFORMATION_MESSAGE);
+        }
     }
 
     public void clickTile(logic.Location at) {

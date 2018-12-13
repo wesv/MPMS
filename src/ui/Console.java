@@ -1,6 +1,5 @@
 package ui;
 
-import exceptions.GameEndException;
 import logic.Field;
 import logic.MineTile;
 import logic.NumberTile;
@@ -30,9 +29,7 @@ public class Console implements Runnable {
 
             switch(input[0].toLowerCase()) {
                 case "flip":
-                    try {
-                        f.flip(new logic.Location(x, y));
-                    } catch (GameEndException e) {
+                    if(!f.flip(new logic.Location(x, y))){
                         f.flipAllMines();
                         System.out.println(fieldToString(f));
                         System.out.println("you suck lol");
@@ -83,7 +80,7 @@ public class Console implements Runnable {
                 return "M";
             }
             if (mine instanceof NumberTile)
-                return ((NumberTile) mine).getNumMines() + "";
+                return ((NumberTile) mine).nearbyMines() + "";
         }
         return "_";
     }

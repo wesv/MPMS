@@ -1,7 +1,5 @@
 package logic;
 
-import exceptions.GameEndException;
-
 public class Field {
     /* The size of the board in nxn */
     private int _n;
@@ -29,32 +27,30 @@ public class Field {
         _board.at(loc).toggleFlag();
     }
 
-    public void flip(Location l) throws GameEndException {
+    public boolean flip(Location l) {
 
-        if(!isValidLocation(l)) return;
+        if(!isValidLocation(l)) return false;
 
         Tile t = _board.at(l);
 
-        if(t.isFlagged() || t.hasBeenAccessed()) return;
+        if(t.isFlagged() || t.hasBeenAccessed()) return false;
 
-        t.flip();
+        boolean response = t.flip();
 
         //Flip all surrounding tiles if no surrounding mines
-        if(t instanceof NumberTile && ((NumberTile)t).getNumMines() == 0) {
+        if(t instanceof NumberTile && ((NumberTile)t).nearbyMines() == 0) {
             flip(l.up());
             flip(l.down());
             flip(l.left());
             flip(l.right());
             flip(l.diagonalUpLeft());
-            flip(l.diagonalUpRight());
+            flip(l.diagonalUpRight()) ;
             flip(l.diagonalDownLeft());
             flip(l.diagonalDownRight());
         }
-    }
 
-    /*public void flip(int x, int y) throws GameEndException {
-        flip(Location.create(x, y));
-    }*/
+        return response;
+    }
 
     public void flipAllMines() {
         for(int x = 0; x < _n; x++) {

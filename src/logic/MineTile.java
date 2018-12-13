@@ -1,16 +1,14 @@
 package logic;
 
-import exceptions.GameEndException;
-
 public class MineTile extends Tile {
 
     private boolean normalFlip = false;
 
     @Override
-    public void flip() throws GameEndException {
+    public boolean flip() {
         super.flip();
         normalFlip = true;
-        throw new GameEndException("You have hit a mine.");
+        return true;
     }
 
     public void endOfGameFlip() {

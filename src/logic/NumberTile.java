@@ -7,7 +7,7 @@ public class NumberTile extends Tile {
         _surroundingMines = numMines;
     }
 
-    public int getNumMines() {
+    public int nearbyMines() {
         return _surroundingMines;
     }
 
@@ -15,7 +15,7 @@ public class NumberTile extends Tile {
         if(isFlagged())
             return "" + Tile.flagChar;
         if(hasBeenAccessed())
-            return "\u001B[31m" + getNumMines() + "\u001B[0m";
-        return "" + getNumMines();
+            return "\u001B[31m" + nearbyMines() + "\u001B[0m";
+        return "" + nearbyMines();
     }
 }

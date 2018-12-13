@@ -1,6 +1,5 @@
 package ui;
 
-import exceptions.GameEndException;
 import logic.*;
 
 public class Controller {
@@ -49,14 +48,14 @@ public class Controller {
     }
 
     /**
-     * Flips the mine on the grid at position <code>pos</code>
+     * Flips the mine on the grid at position <code>pos</code>. Calls the flip method in the <code>Field</code> class. Then, if a GameEndException is thrown
      * @param pos
+     * @see Field
      */
     void flip(Location pos) {
-        try {
-            field.flip(pos);
+        if(!field.flip(pos))
             update();
-        } catch (GameEndException e) {
+        else {
             field.flipAllMines();
             update();
             view.endGame(GameEndReasons.HIT_MINE);
@@ -93,7 +92,7 @@ public class Controller {
                             model.setStatus(x, y, Model.MINE);
                     }
                     else if (t instanceof NumberTile)
-                        model.setStatus(x, y, ((NumberTile) t).getNumMines());
+                        model.setStatus(x, y, ((NumberTile) t).nearbyMines());
                 }
                 else if(t.isFlagged())
                     model.setStatus(x, y, Model.FLAGGED);
