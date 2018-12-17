@@ -96,7 +96,7 @@ public class SwingView implements View{
             @Override
             public void mouseReleased(MouseEvent e) {
                 // If the mouse is still in bounds of the button when clicked */
-                if(new Rectangle(e.getComponent().getLocationOnScreen(), e.getComponent().getSize()).contains(e.getLocationOnScreen())) {
+                if (new Rectangle(e.getComponent().getLocationOnScreen(), e.getComponent().getSize()).contains(e.getLocationOnScreen())) {
                     _controller.restart();
                     _tilesCanBeClicked = true;
                 }
@@ -207,37 +207,37 @@ public class SwingView implements View{
 
         for(int x = 0; x < _tiles.length; x++) {
             for (int y = 0; y < _tiles[x].length; y++) {
-                int status = m.getStatus(x, y);
+                Model.Status status = m.getStatus(x, y);
                 switch(status) {
-                    case Model.FLAGGED:
+                    case FLAGGED:
                         _tiles[x][y].setIcon(_flagPic);
                         flags++;
                         break;
-                    case Model.MINE:
+                    case MINE:
                         _tiles[x][y].setIcon(_minePic);
                         _tiles[x][y].indent();
                         break;
-                    case Model.CLICKED_MINE:
+                    case CLICKED_MINE:
                         _tiles[x][y].setIcon(_minePic);
                         _tiles[x][y].indent();
                         _tiles[x][y].setBackground(Color.RED);
                         break;
-                    case Model.FLAGGED_MINE:
+                    case FLAGGED_MINE:
                         _tiles[x][y].setIcon(mixFlagAndMineImages());
                         _tiles[x][y].indent();
                         flags++;
                         break;
-                    case Model.UNFLIPPED:
+                    case UNFLIPPED:
                         _tiles[x][y].setText("");
                         _tiles[x][y].setIcon(null);
                         _tiles[x][y].unindent();
                         break;
-                    case 0:
+                    case ZERO_NEARBY_MINES:
                         _tiles[x][y].setText("");
                         _tiles[x][y].indent();
                         break;
                     default:
-                        _tiles[x][y].setText(""+ status);
+                        _tiles[x][y].setText(""+ status.value());
                         _tiles[x][y].indent();
                 }
             }

@@ -1,6 +1,7 @@
 package ui;
 
 import logic.*;
+import ui.Model.Status;
 
 public class Controller {
 
@@ -85,19 +86,20 @@ public class Controller {
                 if(t.hasBeenAccessed()) {
                     if (t instanceof MineTile) {
                         if (((MineTile) t).wasNormallyFlipped())
-                            model.setStatus(x, y, Model.CLICKED_MINE);
+                            model.setStatus(x, y, Status.CLICKED_MINE);
                         else if (t.isFlagged())
-                            model.setStatus(x, y, Model.FLAGGED_MINE);
+                            model.setStatus(x, y, Status.FLAGGED_MINE);
                         else
-                            model.setStatus(x, y, Model.MINE);
+                            model.setStatus(x, y, Status.MINE);
                     }
-                    else if (t instanceof NumberTile)
-                        model.setStatus(x, y, ((NumberTile) t).nearbyMines());
+                    else if (t instanceof NumberTile) {
+                        model.setStatus(x, y, Status.valueOf(((NumberTile) t).nearbyMines()));
+                    }
                 }
                 else if(t.isFlagged())
-                    model.setStatus(x, y, Model.FLAGGED);
+                    model.setStatus(x, y, Status.FLAGGED);
                 else
-                    model.setStatus(x, y, Model.UNFLIPPED);
+                    model.setStatus(x, y, Status.UNFLIPPED);
 
             }
         }
