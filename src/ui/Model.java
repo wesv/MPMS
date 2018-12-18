@@ -81,7 +81,7 @@ public class Model {
     }
 
     public boolean isFlipped(int row, int col) {
-        return Integer.parseInt(tileStatus[row][col].name()) >= 0;
+        return tileStatus[row][col].value() >= 0;
     }
 
     public boolean isValid(Location l) {

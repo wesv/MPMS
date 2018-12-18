@@ -19,7 +19,12 @@ public class Array2D<E> {
         return at(Location.create(x, y));
     }
 
+    @Deprecated
     public void putAt(E element, Location l) {
+        _elements[l.X()][l.Y()] = element;
+    }
+
+    public void putAt(Location l, E element) {
         _elements[l.X()][l.Y()] = element;
     }
 

@@ -1,5 +1,6 @@
 package ui;
 
+import ai.AI;
 import logic.*;
 import ui.Model.Status;
 
@@ -12,6 +13,7 @@ public class Controller {
     private Model model;
     private View view;
     private Field field;
+    private AI dumbDumb;
 
     private double _density;
 
@@ -20,6 +22,7 @@ public class Controller {
         field = new Field(size, mineDensity);
         model = new Model(size, field.numMines());
         view = v;
+        dumbDumb = new AI(model);
         v.setController(this);
 
     }
