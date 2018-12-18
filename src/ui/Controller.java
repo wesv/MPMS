@@ -22,7 +22,7 @@ public class Controller {
         field = new Field(size, mineDensity);
         model = new Model(size, field.numMines());
         view = v;
-        dumbDumb = new AI(model);
+        dumbDumb = new AI(model, v);
         v.setController(this);
 
     }
@@ -57,6 +57,7 @@ public class Controller {
      * @see Field
      */
     void flip(Location pos) {
+
         if(!field.flip(pos))
             update();
         else {
@@ -76,6 +77,7 @@ public class Controller {
         updateModel();
         view.updateTiles(model);
 
+        dumbDumb.doMove(model);
         if(field.checkIfWon()) {
             view.endGame(GameEndReasons.WIN);
         }

@@ -20,18 +20,37 @@ public class AI {
 
     }
 
-    public void doMove() {
-        //Find Probability of safe spaces
+    public void advancedMove(Model m) {
+        memory = m;
+
         int xSize = memory.getSize();
         int ySize = memory.getSize();
-        Array2D<Probability> safe = new Array2D<>(memory.getSize());
+
+        AtomicInteger numUnflippedTiles = new AtomicInteger(0);
+        /* Calculate total number of bomb arrangements */
+        doubleForLoop(xSize, ySize, (x, y) -> {
+            if(locationIs(Model.Status.UNFLIPPED, new Location(x, y)))
+                numUnflippedTiles.incrementAndGet();
+        });
+
+        //TODO implement Stirlings Approximation
+
+    }
+
+    public void doMove(Model m) {
+        memory = m;
+
+        //Find Probability of mines spaces
+        int xSize = memory.getSize();
+        int ySize = memory.getSize();
+        Array2D<Probability> mines = new Array2D<>(memory.getSize());
 
         /* Initialize Safe */
         doubleForLoop(xSize, ySize, (x, y) ->
-            safe.putAt(new Location(x, y), new Probability(0))
+            mines.putAt(new Location(x, y), new Probability(0))
         );
 
-        /* Find all safe tiles to click */
+        /* Find all mine tiles */
         doubleForLoop(xSize, ySize, (x, y) -> {
             if(memory.isFlipped(x, y)) {
                 Location here = new Location(x, y);
@@ -42,11 +61,12 @@ public class AI {
                     nearbyFlags.getAndIncrement()
                 );
 
-                /* If all flags are accounted for, they are safe to click */
+                /* If all flags are accounted for, it is safe to click */
                 if(nearbyFlags.get() == memory.getStatus(here).value()) {
-                    doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location ->
-                        safe.putAt(location, new Probability(1))
-                    );
+                    doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
+                        mines.putAt(location, new Probability(1).negate());
+                        System.out.println(location + "exited at -1 ("  + mines.at(location) + ")");
+                    });
                 }
                 /* Else if only a few flags are accounted for */
                 else if(nearbyFlags.get() < memory.getStatus(here).value()) {
@@ -58,19 +78,38 @@ public class AI {
                         numUnflippedTiles.getAndIncrement()
                     );
 
-                    /* Set their probability */
-                    doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
-                        double p = difference / numUnflippedTiles.get();
-                        Probability newProbability = safe.at(location).multiply(new Probability(p));
-                        safe.putAt(location, newProbability);
-                    });
+                    /* If the number of Unflipped tiles is equal to
+                        the number at this tile, it is not mines
+                     */
+                    if(difference == numUnflippedTiles.get()) {
+                        doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
+                            mines.putAt(location, new Probability(1));
+                            System.out.println(location + "exited at 1 ("  + mines.at(location) + ")");
+                        });
+                    }
+                    else {
+                        doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
+                            double p = difference / numUnflippedTiles.get();
+                            Probability newProbability = mines.at(location).multiply(new Probability(p));
+                            mines.putAt(location, newProbability);
+                            System.out.println(location + "exited at multiply ("  + mines.at(location) + ")");
+                        });
+                    }
+                }
+                else {
+                    System.err.println("Not a valid state");
                 }
             }
         });
 
-        doubleForLoop(xSize, ySize, (x, y) -> {
-            
-        });
+        for(int i = 0; i < xSize; i++) {
+            for (int j = 0; j < ySize; j++)
+            {
+                System.out.print(String.format("%7s | ", mines.at(i, j).toString()));
+            }
+            System.out.println();
+        }
+        System.out.println("-----------------------------------------\n\n");
 
     }
 
