@@ -2,31 +2,42 @@ package ai;
 
 public class Probability {
 
-    private double p;
-    private boolean negated;
+    private double _p;
+    private boolean _negated;
+    private boolean _virgin;
 
     public Probability(double value) {
         if(value > 1) System.err.println("value > 1 (" + value);
-        this.p = value;
+        this._p = value;
+        _virgin = false;
 
     }
 
     public Probability negate() {
-        negated = !negated;
+        _negated = !_negated;
         return this;
     }
 
+    public Probability setAsVirgin() {
+        _virgin = true;
+        return this;
+    }
+
+    public boolean isVirgin() {
+        return _virgin;
+    }
+
     public Probability multiply(Probability other) {
-        if(this.negated || other.negated)
-            return new Probability((1-(1-this.p)*(1-other.p))).negate();
-        return new Probability((1-(1-this.p)*(1-other.p)));
+        if(this._negated || other._negated)
+            return new Probability((1-(1-this._p)*(1-other._p))).negate();
+        return new Probability((1-(1-this._p)*(1-other._p)));
     }
 
     public double percent() {
-        return negated?-1*p:p;
+        return _negated ?-1* _p : _p;
     }
 
     public String toString() {
-        return String.format("%s%.4f%%", negated?"-":"", p*100);
+        return String.format("%s%.4f%%", _negated ?"-":"", _p *100);
     }
 }

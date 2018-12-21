@@ -47,7 +47,7 @@ public class AI {
 
         /* Initialize Safe */
         doubleForLoop(xSize, ySize, (x, y) ->
-            mines.putAt(new Location(x, y), new Probability(0))
+            mines.putAt(new Location(x, y), new Probability(0).setAsVirgin())
         );
 
         /* Find all mine tiles */
@@ -56,9 +56,9 @@ public class AI {
                 Location here = new Location(x, y);
 
                 /* Count number of surrounding flags */
-                AtomicInteger nearbyFlags = new AtomicInteger(0);
+                LambdaObject<Integer> nearbyFlags = new LambdaObject<>(0);
                 doFunctionAroundLocation(here, Model.Status.FLAGGED, (location) ->
-                    nearbyFlags.getAndIncrement()
+                    nearbyFlags.set(nearbyFlags.get() + 1)
                 );
 
                 /* If all flags are accounted for, it is safe to click */
@@ -73,15 +73,15 @@ public class AI {
                     Double difference = (double) (memory.getStatus(here).value() - nearbyFlags.get());
 
                     /* Count the number of Unflipped Tiles around the location */
-                    AtomicInteger numUnflippedTiles = new AtomicInteger(0);
+                    LambdaObject<Integer> numUnflippedTiles = new LambdaObject<>(0);
                     doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location ->
-                        numUnflippedTiles.getAndIncrement()
+                        numUnflippedTiles.set(numUnflippedTiles.get() + 1)
                     );
 
                     /* If the number of Unflipped tiles is equal to
                         the number at this tile, it is not mines
                      */
-                    if(difference == numUnflippedTiles.get()) {
+                    if(difference == (double)numUnflippedTiles.get()) {
                         doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
                             mines.putAt(location, new Probability(1));
                             System.out.println(location + "exited at 1 ("  + mines.at(location) + ")");
