@@ -46,15 +46,15 @@ public class AI {
         Array2D<Probability> mines = new Array2D<>(memory.getSize());
 
         /* Initialize Safe */
-        doubleForLoop(xSize, ySize, (x, y) ->
-            mines.putAt(new Location(x, y), new Probability(0).setAsVirgin())
-        );
+        //doubleForLoop(xSize, ySize, (x, y) ->
+        //    mines.putAt(new Location(x, y), new Probability(0).setAsVirgin())
+        //);
 
         /* Find all mine tiles */
         doubleForLoop(xSize, ySize, (x, y) -> {
-            if(memory.isFlipped(x, y)) {
-                Location here = new Location(x, y);
+            Location here = new Location(x, y);
 
+            if(memory.isFlipped(x, y)) {
                 /* Count number of surrounding flags */
                 LambdaObject<Integer> nearbyFlags = new LambdaObject<>(0);
                 doFunctionAroundLocation(here, Model.Status.FLAGGED, (location) ->
@@ -64,7 +64,7 @@ public class AI {
                 /* If all flags are accounted for, it is safe to click */
                 if(nearbyFlags.get() == memory.getStatus(here).value()) {
                     doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
-                        mines.putAt(location, new Probability(1).negate());
+                        mines.putAt(location, new Probability(Integer.MIN_VALUE));
                         System.out.println(location + "exited at -1 ("  + mines.at(location) + ")");
                     });
                 }
@@ -90,7 +90,7 @@ public class AI {
                     else {
                         doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
                             double p = difference / numUnflippedTiles.get();
-                            Probability newProbability = mines.at(location).multiply(new Probability(p));
+                            Probability newProbability = new Probability(p).multiply(mines.at(location));
                             mines.putAt(location, newProbability);
                             System.out.println(location + "exited at multiply ("  + mines.at(location) + ")");
                         });
@@ -99,13 +99,15 @@ public class AI {
                 else {
                     System.err.println("Not a valid state");
                 }
+            } else if(memory.getStatus(x, y) == Model.Status.UNFLIPPED) {
+                mines.putAt(here, new Probability(0).multiply(mines.at(here)));
             }
         });
 
         for(int i = 0; i < xSize; i++) {
             for (int j = 0; j < ySize; j++)
             {
-                System.out.print(String.format("%7s | ", mines.at(i, j).toString()));
+                System.out.print(String.format("%7s | ", mines.at(i, j)));
             }
             System.out.println();
         }

@@ -17,10 +17,10 @@ public abstract class Tile {
      * This method returns <code>true</code> if the flip method for this class has
      * been called, <code>false</code> otherwise.
      *
-     * @return Whether this object has been accessed or not.
+     * @return Whether this object has been flipped or not.
      * @see Tile#flip()
      */
-    public boolean hasBeenAccessed() {
+    public boolean hasBeenFlipped() {
         return _accessed;
     }
 
@@ -38,18 +38,26 @@ public abstract class Tile {
     }
 
     /**
-     *  Flips a tile over. More specifically, this method sets <code>hasBeenAccessed</code> to true.
-     * @return If the tile clicked on should end the game. This method will always return false and subclasses should overwrite this method to set it to true.
+     *  Flips a tile over. Then a boolean is returned denoting whether this tile should end the game or not.
+     *  This method will always return false and subclasses should overwrite this method to set it to true.
+     * @return true if the tile clicked on should end the game, false otherwise.
      */
     public boolean flip() {
         _accessed = true;
         return false;
     }
 
+    /**
+     * Toggles whether this tile is flagged or not.
+     */
     void toggleFlag() {
         _flag = !_flag;
     }
 
+    /**
+     * Returns if the tile is flagged.
+     * @return true if flagged, false otherwise
+     */
     public boolean isFlagged() {
         return _flag;
     }

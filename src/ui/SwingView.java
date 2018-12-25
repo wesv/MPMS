@@ -27,7 +27,7 @@ public class SwingView implements View{
 
     private final int boardWidth = 500;
 
-
+    @Override
     public void init(int width, int height) {
         init((width + height) / 2);
     }
@@ -39,13 +39,14 @@ public class SwingView implements View{
         /* constants used for the UI */
         final int borderWidth = 35;
         final int rowHeight = 60;
+        final Color backgroundColor = new Color(192, 192, 192);
+        final int textFontSize = 30;
+        final int textWidth = 50;
 
         _frame = new JFrame(strings.getString("title"));
         _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         JPanel panel = new JPanel(new BorderLayout());
         JPanel topRow = new JPanel(new GridBagLayout());
-
-        Color backgroundColor = new Color(192, 192, 192);
 
         _field = createField(size, size);
         _field.setBorder(new CompoundBorder(
@@ -61,9 +62,8 @@ public class SwingView implements View{
 
         /* Create the Label Stating the number of mines left to find */
         mineCountLabel = new JLabel("");
-        mineCountLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, 30));
-        mineCountLabel.setPreferredSize(new Dimension(50, rowHeight));
-        mineCountLabel.setBackground(Color.WHITE);
+        mineCountLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, textFontSize));
+        mineCountLabel.setPreferredSize(new Dimension(textWidth, rowHeight));
         GridBagConstraints labelConstraint = new GridBagConstraints();
         labelConstraint.gridx = 0;
         labelConstraint.gridy = 0;
@@ -76,8 +76,8 @@ public class SwingView implements View{
 
         /* Create a label to display time taken */
         JLabel timerLabel = new JLabel("0");
-        timerLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, 30));
-        timerLabel.setPreferredSize(new Dimension(50, rowHeight));
+        timerLabel.setFont(new Font(mineCountLabel.getFont().getName(), Font.PLAIN, textFontSize));
+        timerLabel.setPreferredSize(new Dimension(textWidth, rowHeight));
         timerLabel.setHorizontalAlignment(JLabel.RIGHT);
         GridBagConstraints timerConstraint = new GridBagConstraints();
         timerConstraint.gridx = 2;
@@ -170,6 +170,12 @@ public class SwingView implements View{
         return field;
     }
 
+    /**
+     * Resizes the images used to match the size of the dimension given.
+     * @param pic the <code>ImageIcon</code> to resize
+     * @param size the dimensions of the new shape
+     * @return a new <code>ImageIcon</code> that is the size of <code>size</code>
+     */
     private ImageIcon resizeIcon(ImageIcon pic, Dimension size) {
         Image newImg = pic.getImage().getScaledInstance(
                 (int)size.getWidth(),
@@ -202,6 +208,7 @@ public class SwingView implements View{
         return new ImageIcon(combined);
     }
 
+    @Override
     public void updateTiles(Model m) {
         int flags = 0;
 
@@ -246,10 +253,12 @@ public class SwingView implements View{
         mineCountLabel.setText("" + (m.numMines() - flags));
     }
 
+    @Override
     public void setController(Controller controller) {
         _controller = controller;
     }
 
+    @Override
     public void endGame(Controller.GameEndReasons reasons) {
         _tilesCanBeClicked = false;
         if(reasons == Controller.GameEndReasons.WIN) {
@@ -257,9 +266,17 @@ public class SwingView implements View{
         }
     }
 
+    @Override
     public void clickTile(logic.Location at) {
 
     }
+
+    /* The border constants used for when TileButton is indented/not indented */
+    private Border unindentedBorder = new CompoundBorder(
+            BorderFactory.createMatteBorder(1, 1, 0, 0, Color.WHITE),
+            BorderFactory.createMatteBorder(0, 0, 1, 1, _borderColor)
+    );
+    private Border indentedBorder = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123));;
 
     /**
      * Custom button to be the tiles on the Minesweeper Grid.
@@ -268,10 +285,10 @@ public class SwingView implements View{
         /* The location of the button in the grid */
         private logic.Location loc;
 
-        /* The borders used for when its clicked/not clicked */
-        private Border unindentedBorder;
-        private Border indentedBorder = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123));
-
+        /**
+         * Initialize constants and set the location of the button on the grid.
+         * @param l the location of this button on the grid.
+         */
         TileButton(logic.Location l) {
             this.loc = l;
 
@@ -280,22 +297,34 @@ public class SwingView implements View{
             //Set Area to False so we can draw our own Fill
             super.setContentAreaFilled(false);
 
-            unindentedBorder = new CompoundBorder(
+            /*unindentedBorder = new CompoundBorder(
                     BorderFactory.createMatteBorder(1, 1, 0, 0, Color.WHITE),
                     BorderFactory.createMatteBorder(0, 0, 1, 1, _borderColor)
             );
 
+            indentedBorder = BorderFactory.createMatteBorder(1, 1, 1, 1, new Color(123, 123, 123));
+*/
         }
 
+        /**
+         * Get the location of this button on the grid.
+         * @return The location of this button.
+         */
         logic.Location getGridLocation() {
             return loc;
         }
 
+        /**
+         * Applies the border and background to make the tile look unindented.
+         */
         void unindent() {
             this.setBorder(unindentedBorder);
             this.setBackground(_unindentedColor);
         }
 
+        /**
+         * Applies the border and background to make the tiles look indented.
+         */
         void indent() {
             this.setBorder(indentedBorder);
             this.setBackground(_indentedColor);
@@ -326,6 +355,7 @@ public class SwingView implements View{
 
         @Override
         public void setContentAreaFilled(boolean b) {
+            /* Don't let anything change this property so we can use our own fill */
         }
     }
 }
