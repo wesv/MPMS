@@ -1,5 +1,12 @@
 package logic;
 
+/**
+ * <code>Location</code> is used to store x, y coordinates to be used for any grid-based system.
+ * Here are the guidelines used for this class:
+ *  1) (0, 0) is the top-left corner
+ *  2) increasing the y value goes down on the grid
+ *  3) increasing the x value goes right on the grid
+ */
 public class Location {
     private int _x;
     private int _y;
@@ -13,6 +20,10 @@ public class Location {
         return new Location(x, y);
     }
 
+    /**
+     * Get the location for going up on the grid. This location may or may not be valid.
+     * @return A <code>Location</code> at coordinates (x-1, y)
+     */
     public Location up() {
         return Location.create(this._x - 1, this._y);
     }

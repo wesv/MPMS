@@ -3,6 +3,11 @@ package logic;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
+/**
+ * A 2-dimensional Array Object that can interface with the <code>Location</code> class
+ * @param <E> The type of data to store in this array.
+ * @see Location
+ */
 public class Array2D<E> {
 
     private E[][] _elements;
@@ -16,7 +21,7 @@ public class Array2D<E> {
     }
 
     public E at(int x, int y) {
-        return at(Location.create(x, y));
+        return _elements[x][y];
     }
 
     @Deprecated

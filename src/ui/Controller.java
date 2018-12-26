@@ -17,14 +17,12 @@ public class Controller {
 
     private double _density;
 
-    public Controller(int size, double mineDensity, View v) {
+    public Controller(int size, double mineDensity) {
         this._density = mineDensity;
         field = new Field(size, mineDensity);
         model = new Model(size, field.numMines());
-        view = v;
-        dumbDumb = new AI(this);
-        v.setController(this);
 
+        dumbDumb = new AI(this);
     }
 
     public void start() {
@@ -40,14 +38,15 @@ public class Controller {
     }
 
     /**
-     * Launch a new game with a different size and density.
+     * Launch a new game with a different size and density. The new controller will be automatically set itself to the view
      * @param size The size of hte grid. The grid is a square with a length of size
      * @param mineDensity A percentage for how many mines there should be in the grid
-     * @param newView The view to use this controller on.
+     * @param newView The view to use a new controller on.
      */
     public static void launchNewGame(int size, double mineDensity, View newView) {
-        Controller newController = new Controller(size, mineDensity, newView);
-
+        Controller newController = new Controller(size, mineDensity);
+        newController.setView(newView);
+        newView.setController(newController);
         new Thread(newController::start).start();
     }
 
@@ -77,7 +76,7 @@ public class Controller {
         updateModel();
         view.updateTiles(model);
 
-        dumbDumb.doMove();
+        dumbDumb.executeMove();
         if(field.checkIfWon()) {
             view.endGame(GameEndReasons.WIN);
         }
@@ -88,7 +87,7 @@ public class Controller {
             for(int y = 0; y < model.getSize(); y++) {
                 Tile t = field.getTileAt(new Location(x, y));
 
-                if(t.hasBeenAccessed()) {
+                if(t.hasBeenFlipped()) {
                     if (t instanceof MineTile) {
                         if (((MineTile) t).wasNormallyFlipped())
                             model.setStatus(x, y, Status.CLICKED_MINE);
@@ -114,4 +113,7 @@ public class Controller {
         return model;
     }
 
+    public void setView(View v) {
+        view = v;
+    }
 }

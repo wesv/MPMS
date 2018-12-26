@@ -73,7 +73,7 @@ public class Console implements Runnable {
         if(mine.isFlagged())
             return Tile.flagChar + "";
 
-        if(mine.hasBeenAccessed()) {
+        if(mine.hasBeenFlipped()) {
             if (mine instanceof MineTile) {
                 if(((MineTile)mine).wasNormallyFlipped())
                     return "\u001B[31mM\u001B[0m"; //Red Text Formatting in ANSI

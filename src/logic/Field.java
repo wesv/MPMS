@@ -33,7 +33,7 @@ public class Field {
 
         Tile t = _board.at(l);
 
-        if(t.isFlagged() || t.hasBeenAccessed()) return false;
+        if(t.isFlagged() || t.hasBeenFlipped()) return false;
 
         boolean response = t.flip();
 
@@ -152,7 +152,7 @@ public class Field {
 
                 if(tile instanceof MineTile && !tile.isFlagged())
                     return false;
-                if(tile instanceof NumberTile && !tile.hasBeenAccessed())
+                if(tile instanceof NumberTile && !tile.hasBeenFlipped())
                     return false;
             }
         }
