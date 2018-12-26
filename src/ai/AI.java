@@ -2,29 +2,27 @@ package ai;
 
 import logic.Array2D;
 import logic.Location;
+import ui.Controller;
 import ui.Model;
-import ui.View;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class AI {
-    private Model memory;
-    private View view;
+    private Controller _c;
 
 
-    public AI(Model m, View toClickOn) {
-        memory = m;
-        view = toClickOn;
+    public AI(Controller toClickOn) {
+        _c = toClickOn;
 
     }
 
-    public void advancedMove(Model m) {
-        memory = m;
+    public void advancedMove() {
+        Model _memory = _c.getModel();
 
-        int xSize = memory.getSize();
-        int ySize = memory.getSize();
+        int xSize = _memory.getSize();
+        int ySize = _memory.getSize();
 
         AtomicInteger numUnflippedTiles = new AtomicInteger(0);
         /* Calculate total number of bomb arrangements */
@@ -37,13 +35,13 @@ public class AI {
 
     }
 
-    public void doMove(Model m) {
-        memory = m;
+    public void doMove() {
+        Model _memory = _c.getModel();
 
         //Find Probability of mines spaces
-        int xSize = memory.getSize();
-        int ySize = memory.getSize();
-        Array2D<Probability> mines = new Array2D<>(memory.getSize());
+        int xSize = _memory.getSize();
+        int ySize = _memory.getSize();
+        Array2D<Probability> mines = new Array2D<>(_memory.getSize());
 
         /* Initialize Safe */
         doubleForLoop(xSize, ySize, (x, y) ->
@@ -52,7 +50,7 @@ public class AI {
 
         /* Find all mine tiles */
         doubleForLoop(xSize, ySize, (x, y) -> {
-            if(memory.isFlipped(x, y)) {
+            if(_memory.isFlipped(x, y)) {
                 Location here = new Location(x, y);
 
                 /* Count number of surrounding flags */
@@ -62,15 +60,15 @@ public class AI {
                 );
 
                 /* If all flags are accounted for, it is safe to click */
-                if(nearbyFlags.get() == memory.getStatus(here).value()) {
+                if(nearbyFlags.get() == _memory.getStatus(here).value()) {
                     doFunctionAroundLocation(here, Model.Status.UNFLIPPED, location -> {
                         mines.putAt(location, new Probability(1).negate());
                         System.out.println(location + "exited at -1 ("  + mines.at(location) + ")");
                     });
                 }
                 /* Else if only a few flags are accounted for */
-                else if(nearbyFlags.get() < memory.getStatus(here).value()) {
-                    Double difference = (double) (memory.getStatus(here).value() - nearbyFlags.get());
+                else if(nearbyFlags.get() < _memory.getStatus(here).value()) {
+                    Double difference = (double) (_memory.getStatus(here).value() - nearbyFlags.get());
 
                     /* Count the number of Unflipped Tiles around the location */
                     LambdaObject<Integer> numUnflippedTiles = new LambdaObject<>(0);
@@ -133,7 +131,7 @@ public class AI {
     }
 
     private boolean locationIs(Model.Status type, Location space) {
-        return memory.isValid(space) &&
-                memory.getStatus(space) == type;
+        return _c.getModel().isValid(space) &&
+                _c.getModel().getStatus(space) == type;
     }
 }

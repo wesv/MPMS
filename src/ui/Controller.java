@@ -22,7 +22,7 @@ public class Controller {
         field = new Field(size, mineDensity);
         model = new Model(size, field.numMines());
         view = v;
-        dumbDumb = new AI(model, v);
+        dumbDumb = new AI(this);
         v.setController(this);
 
     }
@@ -77,7 +77,7 @@ public class Controller {
         updateModel();
         view.updateTiles(model);
 
-        dumbDumb.doMove(model);
+        dumbDumb.doMove();
         if(field.checkIfWon()) {
             view.endGame(GameEndReasons.WIN);
         }
@@ -110,5 +110,8 @@ public class Controller {
         }
     }
 
+    public Model getModel() {
+        return model;
+    }
 
 }

@@ -257,7 +257,9 @@ public class SwingView implements View{
         }
     }
 
-    public void clickTile(logic.Location at) {
+    @Override
+    public void moveMouseTo(logic.Location at) {
+        //Move mouse to location
 
     }
 
