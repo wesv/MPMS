@@ -6,6 +6,8 @@ import javax.swing.border.CompoundBorder;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.awt.image.BufferedImage;
 import java.util.ResourceBundle;
 
@@ -45,6 +47,12 @@ public class SwingView implements View{
 
         _frame = new JFrame(strings.getString("title"));
         _frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        _frame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent e) {
+                _controller.stopAllThreads();
+            }
+        });
         JPanel panel = new JPanel(new BorderLayout());
         JPanel topRow = new JPanel(new GridBagLayout());
 
@@ -210,47 +218,49 @@ public class SwingView implements View{
 
     @Override
     public void updateTiles(Model m) {
-        int flags = 0;
+        SwingUtilities.invokeLater(() -> {
+            int flags = 0;
 
-        for(int x = 0; x < _tiles.length; x++) {
-            for (int y = 0; y < _tiles[x].length; y++) {
-                Model.Status status = m.getStatus(x, y);
-                switch(status) {
-                    case FLAGGED:
-                        _tiles[x][y].setIcon(_flagPic);
-                        flags++;
-                        break;
-                    case MINE:
-                        _tiles[x][y].setIcon(_minePic);
-                        _tiles[x][y].indent();
-                        break;
-                    case CLICKED_MINE:
-                        _tiles[x][y].setIcon(_minePic);
-                        _tiles[x][y].indent();
-                        _tiles[x][y].setBackground(Color.RED);
-                        break;
-                    case FLAGGED_MINE:
-                        _tiles[x][y].setIcon(mixFlagAndMineImages());
-                        _tiles[x][y].indent();
-                        flags++;
-                        break;
-                    case UNFLIPPED:
-                        _tiles[x][y].setText("");
-                        _tiles[x][y].setIcon(null);
-                        _tiles[x][y].unindent();
-                        break;
-                    case ZERO_NEARBY_MINES:
-                        _tiles[x][y].setText("");
-                        _tiles[x][y].indent();
-                        break;
-                    default:
-                        _tiles[x][y].setText(""+ status.value());
-                        _tiles[x][y].indent();
+            for (int x = 0; x < _tiles.length; x++) {
+                for (int y = 0; y < _tiles[x].length; y++) {
+                    Model.Status status = m.getStatus(x, y);
+                    switch (status) {
+                        case FLAGGED:
+                            _tiles[x][y].setIcon(_flagPic);
+                            flags++;
+                            break;
+                        case MINE:
+                            _tiles[x][y].setIcon(_minePic);
+                            _tiles[x][y].indent();
+                            break;
+                        case CLICKED_MINE:
+                            _tiles[x][y].setIcon(_minePic);
+                            _tiles[x][y].indent();
+                            _tiles[x][y].setBackground(Color.RED);
+                            break;
+                        case FLAGGED_MINE:
+                            _tiles[x][y].setIcon(mixFlagAndMineImages());
+                            _tiles[x][y].indent();
+                            flags++;
+                            break;
+                        case UNFLIPPED:
+                            _tiles[x][y].setText("");
+                            _tiles[x][y].setIcon(null);
+                            _tiles[x][y].unindent();
+                            break;
+                        case ZERO_NEARBY_MINES:
+                            _tiles[x][y].setText("");
+                            _tiles[x][y].indent();
+                            break;
+                        default:
+                            _tiles[x][y].setText("" + status.value());
+                            _tiles[x][y].indent();
+                    }
                 }
             }
-        }
 
-        mineCountLabel.setText("" + (m.numMines() - flags));
+            mineCountLabel.setText("" + (m.numMines() - flags));
+        });
     }
 
     @Override

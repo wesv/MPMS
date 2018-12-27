@@ -35,6 +35,7 @@ public class Probability {
 
     @Override
     public String toString() {
+        if (_p < 0) return "click";
         return String.format("%.2f%%",  _p *100);
     }
 }

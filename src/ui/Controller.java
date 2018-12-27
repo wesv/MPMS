@@ -6,6 +6,8 @@ import ui.Model.Status;
 
 public class Controller {
 
+    private boolean _canInteract;
+
     public enum GameEndReasons {
         HIT_MINE, WIN, RESTART
     }
@@ -15,6 +17,8 @@ public class Controller {
     private Field field;
     private AI dumbDumb;
 
+    private UIThread aiThread;
+
     private double _density;
 
     public Controller(int size, double mineDensity) {
@@ -23,11 +27,17 @@ public class Controller {
         model = new Model(size, field.numMines());
 
         dumbDumb = new AI(this);
+        aiThread = new UIThread(() -> {
+            Thread.sleep(250);
+            dumbDumb.executeMove();
+        });
+        aiThread.start();
     }
 
     public void start() {
         view.init(model.getSize(), model.getSize());
         view.updateTiles(model);
+        _canInteract = true;
     }
 
     public void restart() {
@@ -35,6 +45,9 @@ public class Controller {
         field = new Field(size, _density);
         model = new Model(size, field.numMines());
         view.updateTiles(model);
+        _canInteract = true;
+        dumbDumb = new AI(this);
+        aiThread.start();
     }
 
     /**
@@ -55,7 +68,8 @@ public class Controller {
      * @param pos
      * @see Field
      */
-    void flip(Location pos) {
+    public void flip(Location pos) {
+        if(!_canInteract) return;
 
         if(!field.flip(pos))
             update();
@@ -63,10 +77,13 @@ public class Controller {
             field.flipAllMines();
             update();
             view.endGame(GameEndReasons.HIT_MINE);
+            _canInteract = false;
         }
     }
 
     public void flag(Location position) {
+        if(!_canInteract) return;
+
         field.flag(position);
 
         update();
@@ -76,9 +93,9 @@ public class Controller {
         updateModel();
         view.updateTiles(model);
 
-        dumbDumb.executeMove();
         if(field.checkIfWon()) {
             view.endGame(GameEndReasons.WIN);
+            _canInteract = false;
         }
     }
 
@@ -107,6 +124,10 @@ public class Controller {
 
             }
         }
+    }
+
+    public void stopAllThreads() {
+        aiThread.terminate();
     }
 
     public Model getModel() {
