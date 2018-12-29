@@ -29,7 +29,7 @@ public class Controller {
         dumbDumb = new AI(this);
         aiThread = new UIThread(() -> {
             Thread.sleep(250);
-            dumbDumb.executeMove();
+            //dumbDumb.executeMove();
         });
         aiThread.start();
     }

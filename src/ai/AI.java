@@ -16,9 +16,11 @@ import java.util.function.Consumer;
 
 public class AI {
     private Controller _c;
-    /* the probability, where if its higher to flag */
+    /* the probability, where if a given probability >= the flag, to flag */
     private double flag_confidence = 0.96;
-    private double click_confidence = 0.40;
+
+    /* the probability, where if a given probability is less than to click */
+    private double flip_confidence = 0.40;
     private FileWriter out;
 
     public AI(Controller toClickOn) {
@@ -174,7 +176,7 @@ public class AI {
 
         }*/
 
-        if(minProb <= click_confidence && maxFlagProb <= flag_confidence) {
+        if(minProb <= flip_confidence && maxFlagProb <= flag_confidence) {
 
             //Pick the location to click randomly
             int index = (int) (Math.random() * safePlaces.size());
